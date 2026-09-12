@@ -1,88 +1,176 @@
 "use client";
 
-import React from "react";
-import { ArrowRight, ArrowDown } from "lucide-react";
-import HeroCanvas from "./HeroCanvas";
+import React, { useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
+import ThreadField from "./ThreadField";
+import SplitText from "./SplitText";
+import Marquee from "./Marquee";
+import Button from "./Button";
+import Clock from "./Clock";
+import { useIntroDone } from "./Intro";
+
+const META = [
+  { k: "Disciplina", v: "Diseño + Desarrollo" },
+  { k: "Base", v: "Barcelona, ES" },
+  { k: "Disponibilidad", v: "Q1 2026" },
+];
 
 export default function Hero() {
+  const ready = useIntroDone();
+  const ref = useRef<HTMLElement>(null);
+
+  // La sección se aleja en vez de desaparecer: el scroll la trata como
+  // una capa de película, no como un bloque de HTML.
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start start", "end start"],
+  });
+  const y = useTransform(scrollYProgress, [0, 1], ["0%", "-18%"]);
+  const scale = useTransform(scrollYProgress, [0, 1], [1, 0.93]);
+  const opacity = useTransform(scrollYProgress, [0, 0.75], [1, 0]);
+  const blur = useTransform(scrollYProgress, [0, 1], ["blur(0px)", "blur(9px)"]);
+
+  const chrome = {
+    hidden: { opacity: 0, y: 16 },
+    show: { opacity: 1, y: 0 },
+  };
+
   return (
-    <section className="relative min-h-screen flex flex-col items-center justify-center bg-[#2E1A47] text-white overflow-hidden">
-      {/* Canvas interactivo */}
-      <HeroCanvas accentColor="#C8FF4D" baseColor="128, 77, 255" />
+    <section
+      ref={ref}
+      id="inicio"
+      className="relative isolate flex min-h-[100svh] flex-col justify-end overflow-hidden bg-ink"
+    >
+      {/* ── Fondo ───────────────────────────────────────────── */}
+      <motion.div className="absolute inset-0 -z-10" style={{ opacity, scale }}>
+        <div className="u-grid-bg absolute inset-0 opacity-70" />
+        <ThreadField className="absolute inset-0 h-full w-full" />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(ellipse 90% 70% at 50% 55%, transparent 30%, rgba(7,4,11,0.7) 100%)",
+          }}
+        />
+      </motion.div>
 
-      {/* Gradientes de profundidad */}
-      <div className="absolute top-0 left-0 right-0 h-64 bg-gradient-to-b from-[#1E0A30] to-transparent pointer-events-none z-0" />
-      <div className="absolute top-1/3 -left-32 w-[500px] h-[500px] bg-[#C8FF4D]/6 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-[#120A1C]/70 rounded-full blur-3xl pointer-events-none" />
-
-      {/* Contenido principal */}
-      <div className="relative z-10 max-w-5xl mx-auto px-6 sm:px-8 text-center pt-28 pb-20">
-        {/* Badge */}
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/8 border border-white/12 text-xs font-medium text-white/75 backdrop-blur-sm mb-10">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#C8FF4D] animate-pulse" />
-          <span>Consultora creativa · Barcelona 2026</span>
-          <span className="w-px h-3 bg-white/20 mx-1" />
-          <span className="text-[#C8FF4D] font-semibold">Diseño & Web</span>
-        </div>
-
-        {/* H1 */}
-        <h1 className="text-[2.6rem] sm:text-6xl md:text-7xl font-bold tracking-tight text-white leading-[1.06] mb-8">
-          Ideas en movimiento{" "}
-          <br className="hidden sm:block" />
-          para un{" "}
-          <span className="text-[#C8FF4D]">
-            futuro real.
-          </span>
-        </h1>
-
-        {/* Subtítulo */}
-        <p className="text-base sm:text-lg text-white/55 max-w-xl mx-auto leading-relaxed mb-12">
-          Diseñamos y construimos sitios web a medida — rápidos, cuidados y sin
-          la burocracia de las agencias grandes.
-        </p>
-
-        {/* CTAs */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
-          <a
-            href="#contacto"
-            className="group inline-flex items-center justify-center gap-2 px-8 py-3.5 text-sm font-bold text-[#2E1A47] bg-[#C8FF4D] hover:bg-white rounded-full transition-all duration-300 shadow-lg shadow-black/20 hover:shadow-xl hover:scale-[1.04] active:scale-[0.98] w-full sm:w-auto"
-          >
-            <span>Contame tu proyecto</span>
-            <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
-          </a>
-
-          <a
-            href="#manifiesto"
-            className="inline-flex items-center justify-center gap-2 px-7 py-3.5 text-sm font-medium text-white/75 hover:text-white bg-transparent hover:bg-white/8 border border-white/15 hover:border-white/30 rounded-full transition-all duration-250 w-full sm:w-auto"
-          >
-            <span>Nuestro Manifiesto</span>
-          </a>
-        </div>
-
-        {/* Pilares */}
-        <div className="mt-20 pt-8 border-t border-white/8">
-          <p className="text-[10px] uppercase tracking-[0.18em] text-white/30 mb-5 font-medium">
-            Nuestra metodología
+      <motion.div style={{ y, opacity, filter: blur }} className="relative flex flex-1 flex-col justify-between">
+        {/* ── Metadatos superiores ──────────────────────────── */}
+        <motion.div
+          variants={chrome}
+          initial="hidden"
+          animate={ready ? "show" : "hidden"}
+          transition={{ duration: 0.9, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+          className="u-shell flex items-start justify-between pt-[calc(var(--gut)+3.5rem)]"
+        >
+          <p className="u-mono max-w-[16ch] leading-[1.8] text-[var(--fg-soft)]">
+            Consultora creativa
+            <br />
+            boutique
           </p>
-          <div className="flex items-center justify-center gap-0">
-            {["Pensar", "Experimentar", "Construir", "Transformar"].map((pilar, idx, arr) => (
-              <React.Fragment key={pilar}>
-                <span className="text-xs font-semibold text-white/50 tracking-wide uppercase">
-                  {pilar}
-                </span>
-                {idx < arr.length - 1 && (
-                  <span className="mx-3 sm:mx-5 text-[#C8FF4D]/40 text-sm">→</span>
-                )}
-              </React.Fragment>
-            ))}
+          <div className="hidden text-right sm:block">
+            <p className="u-mono mb-2 text-[var(--fg-faint)]">Hora local</p>
+            <Clock className="u-mono text-[var(--fg-dim)]" />
           </div>
-        </div>
-      </div>
+        </motion.div>
 
-      {/* Scroll indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 text-white/25 animate-bounce">
-        <ArrowDown className="w-4 h-4" />
-      </div>
+        {/* ── Titular ───────────────────────────────────────── */}
+        <div className="u-shell pb-10 sm:pb-14">
+          <h1
+            className="u-display-tight text-bone"
+            style={{ fontSize: "var(--t-h1)" }}
+          >
+            <SplitText as="span" className="block" gate={ready} immediate by="char" stagger={0.028} delay={0.1}>
+              Ideas en
+            </SplitText>
+            <SplitText
+              as="span"
+              className="block"
+              gate={ready}
+              immediate
+              by="char"
+              stagger={0.028}
+              delay={0.24}
+            >
+              movimiento
+            </SplitText>
+            <span className="flex flex-wrap items-baseline gap-x-[0.22em]">
+              <SplitText
+                as="span"
+                className="text-[var(--fg-soft)]"
+                gate={ready}
+                immediate
+                by="char"
+                stagger={0.028}
+                delay={0.42}
+              >
+                para un
+              </SplitText>
+              <span className="u-clip inline-block align-bottom">
+                <motion.span
+                  initial={{ y: "110%" }}
+                  animate={ready ? { y: "0%" } : { y: "110%" }}
+                  transition={{ duration: 1.15, delay: 0.55, ease: [0.16, 1, 0.3, 1] }}
+                  className="u-serif inline-block pb-[0.12em] text-[1.14em] leading-[0.9] text-lime"
+                >
+                  futuro real.
+                </motion.span>
+              </span>
+            </span>
+          </h1>
+        </div>
+
+        {/* ── Pie del hero ──────────────────────────────────── */}
+        <motion.div
+          variants={chrome}
+          initial="hidden"
+          animate={ready ? "show" : "hidden"}
+          transition={{ duration: 0.9, delay: 0.85, ease: [0.16, 1, 0.3, 1] }}
+          className="u-shell"
+        >
+          <div className="u-hair-t grid grid-cols-1 items-end gap-8 py-7 md:grid-cols-12">
+            <dl className="col-span-1 grid grid-cols-2 gap-x-8 gap-y-6 sm:grid-cols-3 md:col-span-8">
+              {META.map((m) => (
+                <div key={m.k}>
+                  <dt className="u-mono mb-2 text-[var(--fg-faint)]">{m.k}</dt>
+                  <dd className="text-[var(--t-sm)] font-medium text-[var(--fg-dim)]">
+                    {m.v}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+
+            <div className="md:col-span-4 md:flex md:justify-end">
+              <Button href="#contacto" size="lg" cursorLabel="Hablemos">
+                Empecemos
+              </Button>
+            </div>
+          </div>
+        </motion.div>
+      </motion.div>
+
+      {/* ── Cinta inferior ────────────────────────────────────── */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: ready ? 1 : 0 }}
+        transition={{ duration: 1, delay: 1.1 }}
+        className="u-hair-t relative border-b border-[var(--hair)] bg-ink/40 py-3.5 backdrop-blur-sm"
+      >
+        <Marquee
+          items={[
+            "Diseño de interfaz",
+            "Next.js",
+            "Identidad digital",
+            "Core Web Vitals",
+            "Dirección de arte",
+            "Sin plantillas",
+          ]}
+          seconds={52}
+          separator={<span className="text-lime">✦</span>}
+          className="u-mono text-[var(--fg-soft)]"
+        />
+      </motion.div>
+
     </section>
   );
 }

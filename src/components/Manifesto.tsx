@@ -1,221 +1,242 @@
 "use client";
 
 import React, { useRef } from "react";
-import {
-  motion,
-  useScroll,
-  useTransform,
-  useInView,
-} from "framer-motion";
+import { motion, useInView, useScroll, useTransform } from "framer-motion";
+import SectionMarker from "./SectionMarker";
+import Reveal from "./Reveal";
+import Marquee from "./Marquee";
 
-/* ─── Datos ────────────────────────────────────────────────── */
-const dictionary = [
+const lexicon = [
   {
-    word: "FIL",
-    grammar: "sust., cat. /fil/",
-    definition:
-      "Hilo, hebra. Lo que conecta un extremo con otro, punto a punto, hasta volverse algo.",
+    word: "Fil",
+    phon: "/fil/",
+    kind: "sust., catalán",
+    def: "Hilo, hebra. Lo que conecta un extremo con otro, punto a punto, hasta volverse algo.",
+    note: "El material",
   },
   {
-    word: "LAB",
-    grammar: "sust., ingl. /læb/",
-    definition:
-      "Laboratorio. Espacio donde las ideas se prueban, se rompen y se reconstruyen hasta convertirse en algo real.",
+    word: "Lab",
+    phon: "/læb/",
+    kind: "sust., inglés",
+    def: "Laboratorio. Espacio donde las ideas se prueban, se rompen y se reconstruyen hasta convertirse en algo real.",
+    note: "El método",
   },
 ];
 
 const beliefs = [
-  { text: "Creemos en hacer las cosas bien,", accent: "no rápido." },
-  { text: "Creemos en innovar con tecnología,", accent: "no en repetir fórmulas." },
-  { text: "Creemos en hacer equipo —", accent: "con vos, no para vos." },
-  { text: "Creemos en soluciones a medida.", accent: "Nunca genéricas." },
+  { lead: "Creemos en hacer las cosas bien,", accent: "no rápido." },
+  { lead: "Creemos en innovar con tecnología,", accent: "no en repetir fórmulas." },
+  { lead: "Creemos en hacer equipo —", accent: "con vos, no para vos." },
+  { lead: "Creemos en soluciones a medida.", accent: "Nunca genéricas." },
 ];
 
-const closing = "Fil Lab nace de la curiosidad, y crece con cuidado.";
-
-/* ─── Sub-componente: línea del manifiesto con reveal al scroll ─ */
-function BeliefLine({
-  text,
-  accent,
-  index,
-}: {
-  text: string;
-  accent: string;
-  index: number;
-}) {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: "-15% 0px" });
-
-  return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 48 }}
-      animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.75, ease: [0.16, 1, 0.3, 1], delay: index * 0.04 }}
-      className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-3 border-b border-white/8 pb-6"
-    >
-      <span className="text-2xl sm:text-4xl md:text-[3.25rem] font-bold tracking-tight text-white/80 leading-[1.12]">
-        {text}
-      </span>
-      <span className="text-2xl sm:text-4xl md:text-[3.25rem] font-bold tracking-tight text-[#C8FF4D] leading-[1.12] sm:whitespace-nowrap">
-        {accent}
-      </span>
-    </motion.div>
-  );
-}
-
-/* ─── Sub-componente: entrada de diccionario ─────────────────── */
-function DictEntry({
-  word,
-  grammar,
-  definition,
-  index,
-}: {
-  word: string;
-  grammar: string;
-  definition: string;
-  index: number;
-}) {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: "-10% 0px" });
-
-  return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, x: -32 }}
-      animate={inView ? { opacity: 1, x: 0 } : {}}
-      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: index * 0.12 }}
-      className="group"
-    >
-      {/* Palabra + gramática */}
-      <div className="flex items-baseline gap-4 mb-3">
-        <span className="text-[4rem] sm:text-[6rem] md:text-[8rem] font-bold leading-none tracking-tight text-white group-hover:text-[#C8FF4D] transition-colors duration-500">
-          {word}
-        </span>
-        <span className="text-xs sm:text-sm font-mono text-white/30 italic self-end mb-3 sm:mb-5">
-          {grammar}
-        </span>
-      </div>
-      {/* Definición */}
-      <p className="text-base sm:text-lg text-white/55 leading-relaxed max-w-xl pl-1 border-l-2 border-[#C8FF4D]/40 ml-1 pl-5">
-        {definition}
-      </p>
-    </motion.div>
-  );
-}
-
-/* ─── Componente principal ───────────────────────────────────── */
+/**
+ * El único respiro claro de la página. La inversión de tono es deliberada:
+ * el manifiesto se lee como una doble página impresa en medio de una
+ * proyección oscura.
+ */
 export default function Manifesto() {
-  const sectionRef = useRef(null);
-  const closingRef = useRef(null);
-  const closingInView = useInView(closingRef, { once: true, margin: "-15% 0px" });
-
-  // Parallax sutil en el watermark de fondo
+  const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
-    target: sectionRef,
+    target: ref,
     offset: ["start end", "end start"],
   });
-  const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "18%"]);
+  const markY = useTransform(scrollYProgress, [0, 1], ["-8%", "8%"]);
 
   return (
     <section
       id="manifiesto"
-      ref={sectionRef}
-      className="relative overflow-hidden bg-[#2E1A47]"
+      ref={ref}
+      className="relative overflow-hidden bg-paper text-[var(--on-paper)]"
     >
-      {/* ── Watermark de fondo: "FIL" gigante ─────────────────── */}
-      <motion.div
-        style={{ y: bgY }}
-        className="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden"
+      {/* Filigrana: el wordmark gigantesco recortado por el borde */}
+      <motion.span
         aria-hidden="true"
+        style={{ y: markY, fontSize: "var(--t-mega)" }}
+        className="u-display-tight pointer-events-none absolute -right-[6vw] top-[6vh] select-none text-[rgba(21,17,14,0.035)]"
       >
-        <span
-          className="text-[40vw] font-bold leading-none text-white/[0.025] tracking-tight"
-          style={{ fontFeatureSettings: "'ss01'" }}
-        >
-          FIL
-        </span>
-      </motion.div>
+        FIL
+      </motion.span>
 
-      {/* ── Luz ambiental ──────────────────────────────────────── */}
-      <div className="absolute top-1/4 -right-32 w-[500px] h-[500px] bg-[#C8FF4D]/6 rounded-full blur-[100px] pointer-events-none" />
-      <div className="absolute bottom-0 -left-32 w-[400px] h-[400px] bg-[#120A1C]/80 rounded-full blur-[80px] pointer-events-none" />
+      <div className="u-shell relative">
+        {/* ── Léxico ─────────────────────────────────────────── */}
+        <div className="pt-24 sm:pt-36">
+          <SectionMarker index="04" label="Léxico" tone="light" />
 
-      {/* ── Contenido ──────────────────────────────────────────── */}
-      <div className="relative z-10 max-w-5xl mx-auto px-6 sm:px-8">
-
-        {/* ╔══ BLOQUE I: DICCIONARIO ══════════════════════════════╗ */}
-        <div className="pt-24 pb-20 border-b border-white/8">
-
-          {/* Label */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/6 border border-white/10 text-white/50 text-[10px] font-bold uppercase tracking-[0.16em] mb-16"
-          >
-            <span className="w-1.5 h-1.5 rounded-full bg-[#C8FF4D]" />
-            Léxico Fil Lab
-          </motion.div>
-
-          {/* Entradas de diccionario */}
-          <div className="space-y-14">
-            {dictionary.map((entry, i) => (
-              <DictEntry key={entry.word} {...entry} index={i} />
+          <div className="divide-y" style={{ borderColor: "var(--hair-paper)" }}>
+            {lexicon.map((entry, i) => (
+              <Entry key={entry.word} entry={entry} index={i} />
             ))}
           </div>
         </div>
 
-        {/* ╔══ BLOQUE II: MANIFIESTO ══════════════════════════════╗ */}
-        <div className="py-24">
+        {/* ── Manifiesto ─────────────────────────────────────── */}
+        <div className="border-t py-24 sm:py-32" style={{ borderColor: "var(--hair-paper)" }}>
+          <SectionMarker index="05" label="Manifiesto" tone="light" />
 
-          {/* Label */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#C8FF4D]/10 border border-[#C8FF4D]/20 text-[#C8FF4D] text-[10px] font-bold uppercase tracking-[0.16em] mb-16"
-          >
-            <span className="w-1.5 h-1.5 rounded-full bg-[#C8FF4D]" />
-            Manifiesto
-          </motion.div>
-
-          {/* Líneas de creencias */}
-          <div className="space-y-6">
+          <div>
             {beliefs.map((b, i) => (
-              <BeliefLine key={i} {...b} index={i} />
+              <Belief key={i} {...b} index={i} />
             ))}
           </div>
 
-          {/* Cierre — tipografía diferenciada, full reveal */}
-          <motion.div
-            ref={closingRef}
-            initial={{ opacity: 0, scale: 0.97, y: 24 }}
-            animate={closingInView ? { opacity: 1, scale: 1, y: 0 } : {}}
-            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
-            className="mt-12 pt-12 border-t border-white/8"
-          >
-            <p className="text-xl sm:text-2xl md:text-3xl font-semibold text-white/70 leading-relaxed italic max-w-2xl">
-              &ldquo;{closing}&rdquo;
-            </p>
-            {/* Firma visual */}
-            <div className="mt-8 flex items-center gap-3">
-              <span className="inline-block w-8 h-8 rounded-full bg-[#C8FF4D] flex items-center justify-center">
-                <span className="text-[#2E1A47] font-bold text-sm">F</span>
-              </span>
-              <span className="text-xs text-white/30 font-medium tracking-wider uppercase">
-                Fil Lab · Barcelona 2026
-              </span>
-            </div>
-          </motion.div>
-        </div>
+          {/* Cierre firmado */}
+          <Reveal mode="up" delay={0.1} duration={1.1}>
+            <div
+              className="mt-20 grid gap-10 border-t pt-12 sm:mt-28 md:grid-cols-12"
+              style={{ borderColor: "var(--hair-paper)" }}
+            >
+              <p
+                className="u-serif md:col-span-8"
+                style={{ fontSize: "var(--t-h4)", lineHeight: 1.35 }}
+              >
+                &ldquo;Fil Lab nace de la curiosidad, y crece con cuidado.&rdquo;
+              </p>
 
+              <div className="flex items-center gap-4 md:col-span-4 md:justify-end">
+                <span className="flex h-11 w-11 items-center justify-center rounded-full bg-violet">
+                  <span className="text-[13px] font-bold text-paper">F</span>
+                  <span className="ml-[2px] h-1 w-1 rounded-full bg-lime" />
+                </span>
+                <span>
+                  <span className="u-mono block text-[var(--on-paper-dim)]">
+                    Gonzalo Chiavassa
+                  </span>
+                  <span className="u-mono mt-1.5 block text-[var(--on-paper-faint)]">
+                    Fundador · Barcelona
+                  </span>
+                </span>
+              </div>
+            </div>
+          </Reveal>
+        </div>
       </div>
 
-      {/* ── Separador inferior decorativo ─────────────────────── */}
-      <div className="h-px w-full bg-gradient-to-r from-transparent via-[#C8FF4D]/30 to-transparent" />
+      {/* Cinta de cierre, ya en tono oscuro: prepara la vuelta */}
+      <div className="border-t bg-violet py-4" style={{ borderColor: "var(--hair-paper)" }}>
+        <Marquee
+          items={["Pensar", "Experimentar", "Construir", "Transformar"]}
+          seconds={38}
+          dir="right"
+          separator={<span className="text-lime">/</span>}
+          className="u-mono text-[rgba(246,244,240,0.5)]"
+        />
+      </div>
     </section>
+  );
+}
+
+/* ─── Entrada de diccionario ───────────────────────────────── */
+
+function Entry({
+  entry,
+  index,
+}: {
+  entry: (typeof lexicon)[number];
+  index: number;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-15% 0px" });
+
+  return (
+    <div ref={ref} className="grid gap-6 py-14 sm:py-20 md:grid-cols-12 md:gap-10">
+      {/* Nota al margen */}
+      <div className="md:col-span-2">
+        <motion.span
+          initial={{ opacity: 0 }}
+          animate={inView ? { opacity: 1 } : {}}
+          transition={{ duration: 0.7, delay: 0.25 }}
+          className="u-mono text-[var(--on-paper-faint)]"
+        >
+          {entry.note}
+        </motion.span>
+      </div>
+
+      {/* Palabra */}
+      <div className="md:col-span-5">
+        <div className="u-clip">
+          <motion.h3
+            initial={{ y: "105%" }}
+            animate={inView ? { y: "0%" } : {}}
+            transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1], delay: index * 0.08 }}
+            className="u-display-tight"
+            style={{ fontSize: "var(--t-h2)" }}
+          >
+            {entry.word}
+            <span className="u-dot" />
+          </motion.h3>
+        </div>
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={inView ? { opacity: 1 } : {}}
+          transition={{ duration: 0.8, delay: 0.3 }}
+          className="mt-3 flex items-baseline gap-3"
+        >
+          <span className="u-serif text-[var(--t-body)] text-[var(--on-paper-dim)]">
+            {entry.kind}
+          </span>
+          <span className="u-mono-num text-[var(--t-xs)] text-[var(--on-paper-faint)]">
+            {entry.phon}
+          </span>
+        </motion.p>
+      </div>
+
+      {/* Definición */}
+      <div className="md:col-span-5">
+        <motion.p
+          initial={{ opacity: 0, y: 24 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+          className="max-w-[38ch] text-[var(--t-lead)] leading-[1.45] text-[var(--on-paper)]"
+        >
+          {entry.def}
+        </motion.p>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Línea del manifiesto ─────────────────────────────────── */
+
+function Belief({
+  lead,
+  accent,
+  index,
+}: {
+  lead: string;
+  accent: string;
+  index: number;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-18% 0px" });
+
+  return (
+    <div
+      ref={ref}
+      className="group flex items-baseline gap-6 border-b py-7 sm:gap-10 sm:py-9"
+      style={{ borderColor: "var(--hair-paper)" }}
+    >
+      <motion.span
+        initial={{ opacity: 0 }}
+        animate={inView ? { opacity: 1 } : {}}
+        transition={{ duration: 0.6, delay: 0.2 }}
+        className="u-mono-num hidden shrink-0 text-[var(--t-2xs)] text-[var(--on-paper-faint)] sm:block"
+      >
+        0{index + 1}
+      </motion.span>
+
+      <div className="u-clip flex-1">
+        <motion.p
+          initial={{ y: "105%" }}
+          animate={inView ? { y: "0%" } : {}}
+          transition={{ duration: 1.05, ease: [0.16, 1, 0.3, 1] }}
+          className="u-display"
+          style={{ fontSize: "var(--t-h3)" }}
+        >
+          <span className="text-[var(--on-paper)]">{lead} </span>
+          <span className="u-serif text-[1.06em] text-violet-2">{accent}</span>
+        </motion.p>
+      </div>
+    </div>
   );
 }

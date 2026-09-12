@@ -1,140 +1,213 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import Link from "next/link";
-import { ArrowUpRight, Menu, X, Moon, Sun } from "lucide-react";
+import React, { useState } from "react";
+import {
+  AnimatePresence,
+  motion,
+  useMotionValueEvent,
+  useScroll,
+  useSpring,
+} from "framer-motion";
+import { useIntroDone } from "./Intro";
+import Button from "./Button";
+import Clock from "./Clock";
+import Magnetic from "./Magnetic";
+import { scrollTo } from "@/lib/scroll";
+
+const links = [
+  { num: "01", label: "Premisa", href: "#premisa" },
+  { num: "02", label: "Trabajo", href: "#que-hacemos" },
+  { num: "03", label: "Proceso", href: "#proceso" },
+  { num: "04", label: "Manifiesto", href: "#manifiesto" },
+];
 
 export default function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
+  const ready = useIntroDone();
+  const [hidden, setHidden] = useState(false);
+  const [solid, setSolid] = useState(false);
+  const [open, setOpen] = useState(false);
 
-  useEffect(() => {
-    // Preferencia del sistema
-    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    const stored = localStorage.getItem("theme");
-    const isDark = stored ? stored === "dark" : prefersDark;
-    setDarkMode(isDark);
-    document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
-  }, []);
+  const { scrollY, scrollYProgress } = useScroll();
+  const progress = useSpring(scrollYProgress, {
+    stiffness: 260,
+    damping: 40,
+    restDelta: 0.001,
+  });
 
-  const toggleTheme = () => {
-    const next = !darkMode;
-    setDarkMode(next);
-    const value = next ? "dark" : "light";
-    document.documentElement.setAttribute("data-theme", value);
-    localStorage.setItem("theme", value);
+  useMotionValueEvent(scrollY, "change", (y) => {
+    const prev = scrollY.getPrevious() ?? 0;
+    setSolid(y > 40);
+    // Se esconde al bajar y vuelve al primer gesto hacia arriba.
+    if (open) return;
+    setHidden(y > prev && y > 320);
+  });
+
+  const go = (href: string) => {
+    setOpen(false);
+    scrollTo(href);
   };
 
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  const navLinks = [
-    { name: "Qué hacemos", href: "#que-hacemos" },
-    { name: "Cómo trabajamos", href: "#proceso" },
-    { name: "Manifiesto", href: "#manifiesto" },
-    { name: "Por qué Fil Lab", href: "#por-que" },
-  ];
-
   return (
-    <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        scrolled
-          ? "bg-[#2E1A47]/92 backdrop-blur-md py-3 shadow-xl border-b border-white/8"
-          : "bg-transparent py-6"
-      }`}
-    >
-      <div className="max-w-6xl mx-auto px-6 sm:px-8 flex items-center justify-between">
-        {/* Wordmark */}
-        <Link href="/" className="group flex items-center gap-1.5 focus:outline-none">
-          <span className="text-xl font-bold tracking-tight text-white transition-colors duration-200 group-hover:text-[#C8FF4D]">
-            Fil Lab
-          </span>
-          <span className="inline-block w-2 h-2 rounded-full bg-[#C8FF4D] group-hover:scale-150 transition-transform duration-300" />
-        </Link>
-
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-7">
-          {navLinks.map((link) => (
-            <a
-              key={link.name}
-              href={link.href}
-              className="relative text-sm font-medium text-white/65 hover:text-white transition-colors duration-200 after:absolute after:bottom-[-2px] after:left-0 after:w-0 after:h-[1.5px] after:bg-[#C8FF4D] after:transition-all after:duration-300 hover:after:w-full"
-            >
-              {link.name}
-            </a>
-          ))}
-        </nav>
-
-        {/* Acciones */}
-        <div className="hidden md:flex items-center gap-3">
-          {/* Toggle dark mode */}
-          <button
-            onClick={toggleTheme}
-            className="p-2 rounded-full text-white/50 hover:text-white hover:bg-white/10 transition-all duration-200"
-            aria-label="Cambiar modo"
-          >
-            {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-          </button>
-
-          <a
-            href="#contacto"
-            className="inline-flex items-center gap-1.5 px-5 py-2.5 text-sm font-bold text-[#2E1A47] bg-[#C8FF4D] hover:bg-white rounded-full transition-all duration-200 shadow-sm hover:shadow-lg hover:scale-[1.03] active:scale-[0.97]"
-          >
-            <span>Hablemos</span>
-            <ArrowUpRight className="w-4 h-4" />
-          </a>
-        </div>
-
-        {/* Mobile trigger */}
-        <button
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="md:hidden p-2 -mr-1 text-white/80 hover:text-white transition-colors"
-          aria-label="Abrir menú"
-        >
-          {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-        </button>
-      </div>
-
-      {/* Mobile dropdown */}
-      <div
-        className={`md:hidden overflow-hidden transition-all duration-300 ${
-          mobileMenuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+    <>
+      <motion.header
+        initial={{ y: -80 }}
+        animate={{ y: ready && !hidden ? 0 : -100 }}
+        transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+        className={`fixed inset-x-0 top-0 z-50 transition-[background-color,backdrop-filter,border-color] duration-700 ${
+          solid
+            ? "border-b border-[var(--hair)] bg-ink/70 backdrop-blur-xl"
+            : "border-b border-transparent bg-transparent"
         }`}
       >
-        <div className="bg-[#2E1A47] border-b border-white/8 px-6 sm:px-8 py-6 space-y-1">
-          {navLinks.map((link) => (
+        <div className="u-shell flex items-center justify-between py-4 sm:py-5">
+          {/* Wordmark */}
+          <Magnetic strength={0.12}>
             <a
-              key={link.name}
-              href={link.href}
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center gap-2 text-base font-medium text-white/75 hover:text-[#C8FF4D] py-2.5 border-b border-white/5 last:border-none transition-colors"
+              href="#inicio"
+              onClick={(e) => {
+                e.preventDefault();
+                scrollTo(0);
+              }}
+              className="group flex items-baseline gap-1.5"
+              aria-label="Fil Lab, inicio"
             >
-              <span className="w-1 h-1 rounded-full bg-[#C8FF4D]/60" />
-              {link.name}
+              <span className="text-[17px] font-bold tracking-[-0.03em] text-bone">
+                Fil Lab
+              </span>
+              <span className="h-1.5 w-1.5 rounded-full bg-lime transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[2.2]" />
             </a>
-          ))}
-          <div className="pt-4 flex items-center gap-3">
-            <a
-              href="#contacto"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-3 text-sm font-bold text-[#2E1A47] bg-[#C8FF4D] hover:bg-white rounded-full transition-colors"
-            >
-              Contame tu proyecto
-              <ArrowUpRight className="w-4 h-4" />
-            </a>
+          </Magnetic>
+
+          {/* Navegación */}
+          <nav className="hidden items-center gap-9 lg:flex">
+            {links.map((l) => (
+              <a
+                key={l.label}
+                href={l.href}
+                onClick={(e) => {
+                  e.preventDefault();
+                  go(l.href);
+                }}
+                className="group flex items-baseline gap-2"
+              >
+                <span className="u-mono-num text-[10px] text-[var(--fg-faint)] transition-colors duration-300 group-hover:text-lime">
+                  {l.num}
+                </span>
+                <span className="u-link text-[13px] font-medium tracking-[-0.01em] text-[var(--fg-dim)] transition-colors duration-300 group-hover:text-bone">
+                  {l.label}
+                </span>
+              </a>
+            ))}
+          </nav>
+
+          {/* Derecha */}
+          <div className="flex items-center gap-5">
+            <Clock className="u-mono hidden text-[var(--fg-faint)] xl:block" />
+
+            <div className="hidden sm:block">
+              <Button href="#contacto" variant="ghost" size="sm" cursorLabel="Hablemos">
+                Iniciar proyecto
+              </Button>
+            </div>
+
             <button
-              onClick={toggleTheme}
-              className="p-3 rounded-full text-white/60 hover:text-white bg-white/8 hover:bg-white/15 transition-all"
+              onClick={() => setOpen(true)}
+              aria-label="Abrir menú"
+              className="flex flex-col items-end gap-[5px] p-2 lg:hidden"
             >
-              {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              <span className="block h-px w-6 bg-bone" />
+              <span className="block h-px w-4 bg-bone" />
             </button>
           </div>
         </div>
-      </div>
-    </header>
+
+        {/* Progreso de lectura */}
+        <motion.div
+          className="h-px origin-left bg-lime"
+          style={{ scaleX: progress }}
+        />
+      </motion.header>
+
+      {/* ── Menú a pantalla completa ────────────────────────── */}
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ clipPath: "inset(0 0 100% 0)" }}
+            animate={{ clipPath: "inset(0 0 0% 0)" }}
+            exit={{ clipPath: "inset(0 0 100% 0)" }}
+            transition={{ duration: 0.7, ease: [0.76, 0, 0.24, 1] }}
+            className="fixed inset-0 z-[80] flex flex-col justify-between bg-violet"
+          >
+            <div className="u-shell flex items-center justify-between py-4 sm:py-5">
+              <span className="flex items-baseline gap-1.5">
+                <span className="text-[17px] font-bold tracking-[-0.03em] text-bone">
+                  Fil Lab
+                </span>
+                <span className="h-1.5 w-1.5 rounded-full bg-lime" />
+              </span>
+              <button
+                onClick={() => setOpen(false)}
+                aria-label="Cerrar menú"
+                className="u-mono p-2 text-[rgba(246,244,240,0.6)]"
+              >
+                Cerrar
+              </button>
+            </div>
+
+            <nav className="u-shell flex flex-1 flex-col justify-center">
+              {links.map((l, i) => (
+                <div key={l.label} className="u-clip border-b border-white/10">
+                  <motion.a
+                    href={l.href}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      go(l.href);
+                    }}
+                    initial={{ y: "110%" }}
+                    animate={{ y: "0%" }}
+                    transition={{
+                      duration: 0.8,
+                      delay: 0.15 + i * 0.07,
+                      ease: [0.16, 1, 0.3, 1],
+                    }}
+                    className="flex items-baseline gap-4 py-4"
+                  >
+                    <span className="u-mono-num text-[11px] text-lime">{l.num}</span>
+                    <span
+                      className="u-display text-bone"
+                      style={{ fontSize: "var(--t-h3)" }}
+                    >
+                      {l.label}
+                    </span>
+                  </motion.a>
+                </div>
+              ))}
+            </nav>
+
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5, duration: 0.6 }}
+              className="u-shell flex flex-col gap-6 pb-10"
+            >
+              <a
+                href="#contacto"
+                onClick={(e) => {
+                  e.preventDefault();
+                  go("#contacto");
+                }}
+                className="flex items-center justify-center rounded-full bg-lime px-8 py-4 text-[14px] font-bold text-ink"
+              >
+                Iniciar proyecto
+              </a>
+              <div className="flex items-center justify-between">
+                <span className="u-mono text-[rgba(246,244,240,0.4)]">Barcelona</span>
+                <Clock className="u-mono text-[rgba(246,244,240,0.4)]" />
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 }

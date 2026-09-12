@@ -1,177 +1,215 @@
 "use client";
 
 import React, { useState } from "react";
-import { MessageCircle, Mail, Send, CheckCircle2, ArrowRight } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowUpRight, Check } from "lucide-react";
 import confetti from "canvas-confetti";
+import SectionMarker from "./SectionMarker";
+import Reveal from "./Reveal";
+import SplitText from "./SplitText";
+import Magnetic from "./Magnetic";
+
+const EMAIL = "gonzalo.chiavassa@gmail.com";
+const WHATSAPP = "https://wa.me/34644634884";
+
+const channels = [
+  { label: "WhatsApp", value: "+34 644 634 884", href: WHATSAPP, note: "La vía más rápida" },
+  { label: "Correo", value: EMAIL, href: `mailto:${EMAIL}`, note: "Para briefs largos" },
+];
+
+const fields = [
+  { id: "name", num: "01", label: "Cómo te llamás", type: "text", placeholder: "Nombre y apellido" },
+  { id: "email", num: "02", label: "Dónde te escribimos", type: "email", placeholder: "tu@correo.com" },
+] as const;
 
 export default function Contact() {
-  const [formData, setFormData] = useState({ name: "", email: "", message: "" });
-  const [submitted, setSubmitted] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [form, setForm] = useState({ name: "", email: "", message: "" });
+  const [sent, setSent] = useState(false);
+
+  const update = (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+    setForm((f) => ({ ...f, [key]: e.target.value }));
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      setSubmitted(true);
-      try {
-        confetti({
-          particleCount: 60,
-          spread: 70,
-          origin: { y: 0.8 },
-          colors: ["#C8FF4D", "#2E1A47", "#ffffff"],
-        });
-      } catch (err) {
-        console.error(err);
-      }
-    }, 600);
+
+    /* Sin backend propio: el formulario compone el correo y lo entrega al
+       cliente de mail del visitante. Para recibirlo en un buzón sin salir
+       de la página, reemplazar este bloque por un POST a Formspree o Resend. */
+    const subject = encodeURIComponent(`Nuevo proyecto — ${form.name}`);
+    const body = encodeURIComponent(
+      `Nombre: ${form.name}\nEmail: ${form.email}\n\n${form.message}\n`,
+    );
+    window.location.href = `mailto:${EMAIL}?subject=${subject}&body=${body}`;
+
+    setSent(true);
+    try {
+      confetti({
+        particleCount: 70,
+        spread: 64,
+        startVelocity: 34,
+        ticks: 160,
+        origin: { y: 0.72 },
+        colors: ["#C8FF4D", "#6B3FA8", "#F6F4F0"],
+        disableForReducedMotion: true,
+      });
+    } catch {
+      /* confetti es decorativo: si falla, el envío ya ocurrió */
+    }
   };
 
   return (
-    <section id="contacto" className="py-24 bg-[#2E1A47] text-white relative overflow-hidden">
-      {/* Luz ambiental */}
-      <div className="absolute top-0 right-1/4 w-96 h-96 bg-[#C8FF4D]/8 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-72 h-72 bg-[#120A1C]/60 rounded-full blur-3xl pointer-events-none" />
+    <section id="contacto" className="relative overflow-hidden bg-ink pb-24 pt-24 sm:pb-32 sm:pt-32">
+      {/* Resplandor del nodo detrás del bloque */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute left-1/2 top-0 h-[42rem] w-[42rem] -translate-x-1/2 -translate-y-1/3 rounded-full"
+        style={{
+          background:
+            "radial-gradient(circle, rgba(200,255,77,0.10) 0%, rgba(107,63,168,0.08) 40%, transparent 70%)",
+        }}
+      />
 
-      <div className="max-w-6xl mx-auto px-6 sm:px-8 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-          {/* Info y vías directas */}
-          <div className="lg:col-span-5 space-y-8">
-            <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/8 border border-white/12 text-[#C8FF4D] text-xs font-semibold uppercase tracking-wider mb-4">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#C8FF4D]" />
-                <span>Contacto</span>
-              </div>
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white leading-tight">
-                Empecemos a conectar ideas.
-              </h2>
-              <p className="mt-4 text-white/60 text-base sm:text-lg leading-relaxed">
-                Contame qué tenés en mente. Ya sea un proyecto nuevo desde cero,
-                un rediseño o una idea que busca forma.
+      <div className="u-shell relative">
+        <SectionMarker index="07" label="Contacto" />
+
+        <div className="grid gap-16 md:grid-cols-12 md:gap-14">
+          {/* ── Invitación y vías directas ─────────────────────── */}
+          <div className="md:col-span-5">
+            <h2 className="u-display-tight text-bone" style={{ fontSize: "var(--t-h2)" }}>
+              <SplitText as="span" className="block" by="char" stagger={0.03}>
+                Contanos
+              </SplitText>
+              <span className="u-serif block text-[1.1em] text-lime">la idea.</span>
+            </h2>
+
+            <Reveal mode="up" delay={0.2} className="mt-8">
+              <p className="max-w-[34ch] text-[var(--t-body)] leading-relaxed text-[var(--fg-dim)]">
+                Contanos qué querés construir y en qué plazo. Respondemos en
+                menos de 24 horas con una primera lectura del proyecto — sin
+                compromiso y sin plantilla de propuesta.
               </p>
-            </div>
+            </Reveal>
 
-            {/* Accesos directos */}
-            <div className="space-y-4 pt-4 border-t border-white/8">
-              <p className="text-xs uppercase font-semibold tracking-wider text-white/40">
-                ¿Preferís saltear el formulario? Escribime directo:
-              </p>
-              <div className="flex flex-col sm:flex-row gap-3">
-                <a
-                  href="https://wa.me/34644634884"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2.5 px-5 py-3 rounded-2xl bg-white/8 hover:bg-white/15 border border-white/12 text-sm font-medium text-white transition-all duration-200 group"
-                >
-                  <MessageCircle className="w-4 h-4 text-[#C8FF4D]" />
-                  <span>WhatsApp</span>
-                  <ArrowRight className="w-3.5 h-3.5 opacity-50 group-hover:translate-x-0.5 transition-transform" />
-                </a>
-                <a
-                  href="mailto:gonzalo.chiavassa@gmail.com"
-                  className="inline-flex items-center justify-center gap-2.5 px-5 py-3 rounded-2xl bg-white/8 hover:bg-white/15 border border-white/12 text-sm font-medium text-white transition-all duration-200 group"
-                >
-                  <Mail className="w-4 h-4 text-[#C8FF4D]" />
-                  <span className="truncate">gonzalo.chiavassa@gmail.com</span>
-                  <ArrowRight className="w-3.5 h-3.5 opacity-50 group-hover:translate-x-0.5 transition-transform flex-shrink-0" />
-                </a>
-              </div>
-            </div>
-
-            {/* Metadatos */}
-            <div className="text-xs text-white/35 space-y-1">
-              <p>📍 Barcelona, España</p>
-              <p>⚡ Respuesta garantizada en menos de 24 horas hábiles.</p>
+            <div className="mt-12">
+              {channels.map((c, i) => (
+                <Reveal key={c.label} mode="fade" delay={0.1 + i * 0.08}>
+                  <a
+                    href={c.href}
+                    target={c.href.startsWith("http") ? "_blank" : undefined}
+                    rel="noopener noreferrer"
+                    data-cursor="Abrir"
+                    className="group flex items-center justify-between border-t border-[var(--hair)] py-6 last:border-b"
+                  >
+                    <span>
+                      <span className="u-mono mb-2 block text-[var(--fg-faint)]">
+                        {c.label} · {c.note}
+                      </span>
+                      <span className="text-[var(--t-h4)] font-medium tracking-[-0.02em] text-bone transition-colors duration-500 group-hover:text-lime">
+                        {c.value}
+                      </span>
+                    </span>
+                    <ArrowUpRight className="h-5 w-5 shrink-0 text-[var(--fg-faint)] transition-all duration-500 group-hover:translate-x-1 group-hover:-translate-y-1 group-hover:text-lime" />
+                  </a>
+                </Reveal>
+              ))}
             </div>
           </div>
 
-          {/* Formulario en Card */}
-          <div
-            className="lg:col-span-7 rounded-3xl p-8 sm:p-10 shadow-[0_32px_80px_-12px_rgba(0,0,0,0.55)] ring-1 ring-white/8"
-            style={{ backgroundColor: "var(--card-bg)", color: "var(--text-primary)" }}
-          >
-            {submitted ? (
-              <div className="py-12 text-center space-y-4">
-                <div className="w-14 h-14 bg-[#C8FF4D]/20 rounded-full flex items-center justify-center mx-auto">
-                  <CheckCircle2 className="w-8 h-8 text-[#2E1A47]" />
-                </div>
-                <h3 className="text-2xl font-bold" style={{ color: "var(--text-primary)" }}>
-                  ¡Mensaje enviado con éxito!
-                </h3>
-                <p className="text-sm max-w-md mx-auto" style={{ color: "var(--text-secondary)" }}>
-                  Gracias por escribir. Voy a revisar los detalles de tu idea y te responderé en breve.
-                </p>
-                <button
-                  onClick={() => { setSubmitted(false); setFormData({ name: "", email: "", message: "" }); }}
-                  className="inline-block mt-4 text-xs font-semibold text-[#2E1A47] hover:underline"
+          {/* ── Formulario ──────────────────────────────────────── */}
+          <div className="md:col-span-6 md:col-start-7">
+            <AnimatePresence mode="wait">
+              {sent ? (
+                <motion.div
+                  key="ok"
+                  initial={{ opacity: 0, y: 24 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                  className="flex min-h-[26rem] flex-col justify-center border border-[var(--hair)] p-10"
                 >
-                  Enviar otro mensaje
-                </button>
-              </div>
-            ) : (
-              <form onSubmit={handleSubmit} className="space-y-6">
-                {[
-                  { id: "name", label: "Tu nombre", type: "text", placeholder: "Ej. Martín Soler" },
-                  { id: "email", label: "Tu correo electrónico", type: "email", placeholder: "martin@empresa.com" },
-                ].map((field) => (
-                  <div key={field.id}>
-                    <label htmlFor={field.id} className="block text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "var(--text-secondary)" }}>
-                      {field.label}
+                  <span className="mb-8 flex h-12 w-12 items-center justify-center rounded-full bg-lime">
+                    <Check className="h-5 w-5 text-ink" strokeWidth={3} />
+                  </span>
+                  <h3 className="u-display mb-4 text-bone" style={{ fontSize: "var(--t-h4)" }}>
+                    Listo, {form.name.split(" ")[0] || "gracias"}.
+                  </h3>
+                  <p className="max-w-[38ch] text-[var(--t-body)] leading-relaxed text-[var(--fg-dim)]">
+                    Abrimos tu cliente de correo con el mensaje ya escrito —
+                    solo queda darle enviar. Si no se abrió, escribinos directo
+                    a{" "}
+                    <a href={`mailto:${EMAIL}`} className="u-link text-lime">
+                      {EMAIL}
+                    </a>
+                    .
+                  </p>
+                  <button
+                    onClick={() => setSent(false)}
+                    className="u-mono mt-10 self-start text-[var(--fg-faint)] transition-colors duration-300 hover:text-bone"
+                  >
+                    ← Volver al formulario
+                  </button>
+                </motion.div>
+              ) : (
+                <motion.form
+                  key="form"
+                  onSubmit={handleSubmit}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="space-y-10"
+                >
+                  {fields.map((f) => (
+                    <Reveal key={f.id} mode="up" duration={0.8}>
+                      <label className="block">
+                        <span className="u-mono mb-4 flex items-center gap-3 text-[var(--fg-faint)]">
+                          <span className="u-mono-num text-lime">{f.num}</span>
+                          {f.label}
+                        </span>
+                        <input
+                          required
+                          type={f.type}
+                          value={form[f.id]}
+                          onChange={update(f.id)}
+                          placeholder={f.placeholder}
+                          className="u-field"
+                        />
+                      </label>
+                    </Reveal>
+                  ))}
+
+                  <Reveal mode="up" duration={0.8}>
+                    <label className="block">
+                      <span className="u-mono mb-4 flex items-center gap-3 text-[var(--fg-faint)]">
+                        <span className="u-mono-num text-lime">03</span>
+                        Qué querés construir
+                      </span>
+                      <textarea
+                        required
+                        rows={3}
+                        value={form.message}
+                        onChange={update("message")}
+                        placeholder="Contanos el proyecto, el plazo y qué tenés hoy…"
+                        className="u-field"
+                      />
                     </label>
-                    <input
-                      type={field.type}
-                      id={field.id}
-                      required
-                      value={formData[field.id as keyof typeof formData]}
-                      onChange={(e) => setFormData({ ...formData, [field.id]: e.target.value })}
-                      placeholder={field.placeholder}
-                      className="w-full px-4 py-3.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#2E1A47] transition-all"
-                      style={{
-                        backgroundColor: "var(--surface-pill)",
-                        border: "1px solid var(--card-border)",
-                        color: "var(--text-primary)",
-                      }}
-                    />
-                  </div>
-                ))}
+                  </Reveal>
 
-                <div>
-                  <label htmlFor="message" className="block text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "var(--text-secondary)" }}>
-                    Contame sobre el proyecto o tu idea
-                  </label>
-                  <textarea
-                    id="message"
-                    required
-                    rows={4}
-                    value={formData.message}
-                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                    placeholder="¿Qué necesitás construir? ¿Tenés una fecha estimada o un sitio de referencia?"
-                    className="w-full px-4 py-3.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#2E1A47] transition-all resize-none"
-                    style={{
-                      backgroundColor: "var(--surface-pill)",
-                      border: "1px solid var(--card-border)",
-                      color: "var(--text-primary)",
-                    }}
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-[#2E1A47] text-white font-bold text-sm hover:bg-[#3d2460] transition-all duration-200 shadow-md hover:shadow-lg disabled:opacity-70 active:scale-[0.99]"
-                >
-                  {loading ? (
-                    <span>Enviando...</span>
-                  ) : (
-                    <>
-                      <span>Enviar mensaje</span>
-                      <Send className="w-4 h-4 text-[#C8FF4D]" />
-                    </>
-                  )}
-                </button>
-              </form>
-            )}
+                  <Reveal mode="up" duration={0.8}>
+                    <Magnetic strength={0.12}>
+                      <button
+                        type="submit"
+                        data-cursor="Enviar"
+                        className="group relative isolate flex w-full items-center justify-between overflow-hidden rounded-full bg-lime px-8 py-5 text-left"
+                      >
+                        <span className="absolute inset-0 -z-10 translate-y-full rounded-full bg-bone transition-transform duration-[620ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-y-0" />
+                        <span className="text-[15px] font-bold tracking-[-0.01em] text-ink">
+                          Enviar el proyecto
+                        </span>
+                        <ArrowUpRight className="h-5 w-5 text-ink transition-transform duration-500 group-hover:translate-x-1 group-hover:-translate-y-1" />
+                      </button>
+                    </Magnetic>
+                  </Reveal>
+                </motion.form>
+              )}
+            </AnimatePresence>
           </div>
         </div>
       </div>

@@ -1,70 +1,344 @@
 @import "tailwindcss";
 
+/* ═══════════════════════════════════════════════════════════
+   FIL LAB — Sistema de diseño
+   Dirección: cinematográfica, editorial, oscura.
+   Un único color brillante (lima). Un único respiro claro (papel).
+   ═══════════════════════════════════════════════════════════ */
+
 @theme {
-  --font-sans: var(--font-sora), system-ui, -apple-system, sans-serif;
+  /* Tipografía */
+  --font-sans:    var(--font-sora), system-ui, -apple-system, sans-serif;
+  --font-serif:   var(--font-instrument), Georgia, "Times New Roman", serif;
+  --font-mono:    var(--font-jetbrains), ui-monospace, "SF Mono", Menlo, monospace;
 
-  /* Paleta "Editorial Bold" — tokens canónicos */
-  --color-bg:              #F5F3EF;
-  --color-surface:         #2E1A47;
-  --color-accent:          #C8FF4D;
-  --color-text-primary:    #1A1A18;
-  --color-text-secondary:  #6B6258;
-
-  /* Dark mode */
-  --color-bg-dark:         #120A1C;
-  --color-surface-dark:    #2E1A47;
-  --color-text-primary-dark:   #F5F3EF;
-  --color-text-secondary-dark: #B8AFC4;
+  /* Paleta */
+  --color-ink:       #07040B;
+  --color-ink-2:     #0D0715;
+  --color-violet:    #2E1A47;
+  --color-violet-2:  #452873;
+  --color-violet-3:  #6B3FA8;
+  --color-lime:      #C8FF4D;
+  --color-paper:     #F3F1EC;
+  --color-paper-2:   #E6E2D8;
+  --color-paper-ink: #15110E;
+  --color-bone:      #F6F4F0;
 }
 
-/* ─── Tokens vía CSS variables ─────────────────────────────── */
 :root {
-  --bg:             #F5F3EF;
-  --surface:        #2E1A47;
-  --accent:         #C8FF4D;
-  --text-primary:   #1A1A18;
-  --text-secondary: #6B6258;
-  --card-bg:        #FFFFFF;
-  --card-border:    rgba(26, 26, 24, 0.08);
-  --surface-muted:  rgba(46, 26, 71, 0.06);
-  --surface-pill:   rgba(46, 26, 71, 0.08);
+  /* Superficies */
+  --ink:        #07040B;
+  --ink-2:      #0D0715;
+  --violet:     #2E1A47;
+  --violet-2:   #452873;
+  --lime:       #C8FF4D;
+  --paper:      #F3F1EC;
+  --paper-ink:  #15110E;
+
+  /* Texto sobre oscuro */
+  --fg:         #F6F4F0;
+  --fg-dim:     rgba(246, 244, 240, 0.56);
+  --fg-soft:    rgba(246, 244, 240, 0.34);
+  --fg-faint:   rgba(246, 244, 240, 0.16);
+  --hair:       rgba(246, 244, 240, 0.10);
+  --hair-soft:  rgba(246, 244, 240, 0.05);
+
+  /* Texto sobre claro */
+  --on-paper:       #15110E;
+  --on-paper-dim:   rgba(21, 17, 14, 0.58);
+  --on-paper-faint: rgba(21, 17, 14, 0.30);
+  --hair-paper:     rgba(21, 17, 14, 0.12);
+
+  /* Escala tipográfica fluida */
+  --t-2xs:  clamp(0.625rem, 0.61rem + 0.07vw, 0.6875rem);
+  --t-xs:   clamp(0.6875rem, 0.67rem + 0.1vw, 0.75rem);
+  --t-sm:   clamp(0.8125rem, 0.79rem + 0.12vw, 0.875rem);
+  --t-body: clamp(0.9375rem, 0.9rem + 0.22vw, 1.0625rem);
+  --t-lead: clamp(1.125rem, 1rem + 0.6vw, 1.5rem);
+  --t-h4:   clamp(1.25rem, 1.1rem + 0.8vw, 1.875rem);
+  --t-h3:   clamp(1.625rem, 1.3rem + 1.7vw, 2.875rem);
+  --t-h2:   clamp(2.25rem, 1.4rem + 4.4vw, 5.5rem);
+  --t-h1:   clamp(2.75rem, 1rem + 8.2vw, 8.5rem);
+  --t-mega: clamp(4.5rem, 0.5rem + 19vw, 22rem);
+
+  /* Ritmo y layout */
+  --gut:    clamp(1.25rem, 4vw, 4.5rem);
+  --shell:  1680px;
+
+  /* Movimiento */
+  --ease-out:  cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.76, 0, 0.24, 1);
 }
 
-[data-theme="dark"] {
-  --bg:             #120A1C;
-  --surface:        #2E1A47;
-  --accent:         #C8FF4D;
-  --text-primary:   #F5F3EF;
-  --text-secondary: #B8AFC4;
-  --card-bg:        #1E0F30;
-  --card-border:    rgba(245, 243, 239, 0.06);
-  --surface-muted:  rgba(46, 26, 71, 0.5);
-  --surface-pill:   rgba(200, 255, 77, 0.1);
-}
+/* ─── Base ─────────────────────────────────────────────────── */
 
-/* ─── Reset base ────────────────────────────────────────────── */
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
 html {
-  scroll-behavior: smooth;
-  color-scheme: light dark;
+  color-scheme: dark;
+  background-color: var(--ink);
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
-  background-color: var(--bg);
-  color: var(--text-primary);
+  margin: 0;
+  background-color: var(--ink);
+  color: var(--fg);
   font-family: var(--font-sans);
-  overflow-x: hidden;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  font-size: var(--t-body);
+  line-height: 1.6;
+  overflow-x: clip;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-synthesis-weight: none;
+  text-rendering: optimizeLegibility;
 }
 
-/* ─── Selección de texto ────────────────────────────────────── */
+/* Lenis necesita que el html no tenga scroll-behavior nativo */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-stopped { overflow: hidden; }
+
 ::selection {
-  background-color: var(--accent);
-  color: var(--surface);
+  background-color: var(--lime);
+  color: var(--ink);
 }
 
-/* ─── Glass utility (navbar) ───────────────────────────────── */
-.glass-header {
-  background-color: rgba(46, 26, 71, 0.88);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+:focus-visible {
+  outline: 2px solid var(--lime);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+img, svg, canvas { display: block; max-width: 100%; }
+
+/* ─── Cursor propio (solo punteros finos) ─────────────────── */
+
+@media (pointer: fine) {
+  body,
+  a, button, [role="button"], input, textarea, select, label[for] {
+    cursor: none;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   UTILIDADES TIPOGRÁFICAS
+   Tres voces: display (Sora 800), serif (Instrument italic), mono.
+   ═══════════════════════════════════════════════════════════ */
+
+.u-display {
+  font-family: var(--font-sans);
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  line-height: 0.86;
+  text-wrap: balance;
+}
+
+.u-display-tight {
+  font-family: var(--font-sans);
+  font-weight: 800;
+  letter-spacing: -0.055em;
+  line-height: 0.82;
+}
+
+.u-serif {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.015em;
+}
+
+.u-mono {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: var(--t-2xs);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  line-height: 1;
+  font-feature-settings: "tnum" 1;
+}
+
+/* El punto de la marca es redondo; el de Sora es cuadrado. */
+.u-dot {
+  display: inline-block;
+  width: 0.16em;
+  height: 0.16em;
+  margin-left: 0.07em;
+  border-radius: 999px;
+  background-color: var(--lime);
+  vertical-align: baseline;
+}
+
+.u-mono-num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+  letter-spacing: 0;
+}
+
+/* ─── Layout ───────────────────────────────────────────────── */
+
+.u-shell {
+  width: 100%;
+  max-width: var(--shell);
+  margin-inline: auto;
+  padding-inline: var(--gut);
+}
+
+.u-hair-t { border-top: 1px solid var(--hair); }
+.u-hair-b { border-bottom: 1px solid var(--hair); }
+
+/* ─── Reveal por máscara ──────────────────────────────────── */
+
+/* El display lo decide quien la usa: hay máscaras en bloque y en línea. */
+.u-clip { overflow: hidden; }
+
+/* ─── Texto contorneado ───────────────────────────────────── */
+
+.u-outline {
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(246, 244, 240, 0.22);
+  transition: -webkit-text-stroke-color 0.7s var(--ease-out), color 0.7s var(--ease-out);
+}
+
+.u-outline-hover:hover .u-outline {
+  color: var(--lime);
+  -webkit-text-stroke-color: transparent;
+}
+
+/* ─── Grano de película ───────────────────────────────────── */
+
+.u-grain {
+  position: fixed;
+  inset: -150%;
+  z-index: 70;
+  pointer-events: none;
+  opacity: 0.045;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+  will-change: transform;
+  animation: grain 0.6s steps(1) infinite;
+}
+
+@keyframes grain {
+  0%   { transform: translate3d(0, 0, 0); }
+  20%  { transform: translate3d(-2%, 3%, 0); }
+  40%  { transform: translate3d(3%, -2%, 0); }
+  60%  { transform: translate3d(-3%, -3%, 0); }
+  80%  { transform: translate3d(2%, 2%, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+
+/* ─── Viñeta ──────────────────────────────────────────────── */
+
+.u-vignette::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse 120% 80% at 50% 45%, transparent 40%, rgba(7, 4, 11, 0.75) 100%);
+}
+
+/* ─── Rejilla técnica de fondo ────────────────────────────── */
+
+.u-grid-bg {
+  background-image:
+    linear-gradient(to right, var(--hair-soft) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--hair-soft) 1px, transparent 1px);
+  background-size: 6rem 6rem;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 40%, black, transparent 85%);
+}
+
+/* ─── Marquesina ──────────────────────────────────────────── */
+
+.u-marquee {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+  animation: marquee var(--marquee-dur, 40s) linear infinite;
+}
+
+.u-marquee[data-dir="right"] { animation-direction: reverse; }
+
+@keyframes marquee {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(-50%, 0, 0); }
+}
+
+/* ─── Latido ──────────────────────────────────────────────── */
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.35; transform: scale(0.8); }
+}
+
+.u-pulse { animation: pulse-dot 2.4s var(--ease-in-out) infinite; }
+
+@keyframes spin-slow {
+  to { transform: rotate(360deg); }
+}
+
+.u-spin-slow { animation: spin-slow 22s linear infinite; }
+
+/* ─── Enlace con subrayado que crece ──────────────────────── */
+
+.u-link {
+  position: relative;
+  display: inline-block;
+}
+
+.u-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 100%;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.6s var(--ease-out);
+}
+
+.u-link:hover::after { transform: scaleX(1); }
+
+/* ─── Input editorial ─────────────────────────────────────── */
+
+.u-field {
+  width: 100%;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--hair);
+  padding: 0.75rem 0 1rem;
+  color: var(--fg);
+  font-family: var(--font-sans);
+  font-size: var(--t-h4);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  outline: none;
+  transition: border-color 0.5s var(--ease-out);
+}
+
+.u-field::placeholder { color: var(--fg-faint); }
+.u-field:focus { border-color: var(--lime); }
+.u-field:focus-visible { outline: none; }
+textarea.u-field { resize: none; line-height: 1.4; }
+
+/* ─── Scrollbar ───────────────────────────────────────────── */
+
+::-webkit-scrollbar { width: 0; height: 0; }
+
+/* ─── Movimiento reducido ─────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .u-grain { animation: none; }
+  .u-marquee { animation: none; }
 }

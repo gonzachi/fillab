@@ -1,5 +1,6 @@
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
+import Premise from "@/components/Premise";
 import Services from "@/components/Services";
 import Process from "@/components/Process";
 import Manifesto from "@/components/Manifesto";
@@ -9,10 +10,11 @@ import Footer from "@/components/Footer";
 
 export default function Home() {
   return (
-    <div className="flex flex-col min-h-screen">
+    <>
       <Navbar />
-      <main className="flex-1">
+      <main>
         <Hero />
+        <Premise />
         <Services />
         <Process />
         <Manifesto />
@@ -20,6 +22,6 @@ export default function Home() {
         <Contact />
       </main>
       <Footer />
-    </div>
+    </>
   );
 }

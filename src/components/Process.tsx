@@ -1,118 +1,176 @@
 "use client";
 
-import React from "react";
-import { Lightbulb, FlaskConical, Layers, Zap } from "lucide-react";
+import React, { useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import SectionMarker from "./SectionMarker";
+import Reveal from "./Reveal";
 
 const steps = [
   {
     num: "01",
-    title: "Pensar",
-    icon: Lightbulb,
-    description: "Entendemos la esencia de tu negocio, tu audiencia y tus objetivos antes de tirar una sola línea de código.",
+    word: "Pensar",
+    claim: "Antes de diseñar, escuchamos.",
+    body: "Entender el negocio, no el brief. Qué decisión querés que tome quien entra, y qué le está impidiendo tomarla hoy.",
+    out: ["Sesión de descubrimiento", "Arquitectura de contenido", "Criterios de éxito"],
   },
   {
     num: "02",
-    title: "Experimentar",
-    icon: FlaskConical,
-    description: "Prototipamos opciones visuales, testeamos interacciones y definimos la arquitectura sin atarnos a plantillas.",
+    word: "Experimentar",
+    claim: "Prototipamos antes de construir.",
+    body: "Las ideas se defienden mal en PDF. Armamos versiones navegables y las rompemos temprano, cuando cambiar sale barato.",
+    out: ["Dirección visual", "Prototipo navegable", "Dos rondas de ajuste"],
   },
   {
     num: "03",
-    title: "Construir",
-    icon: Layers,
-    description: "Desarrollo artesanal con Next.js y código modular. Rápido, accesible y optimizado para móviles y retina.",
+    word: "Construir",
+    claim: "Código artesanal, sin plantillas.",
+    body: "Cada componente escrito para este proyecto. Accesible, rápido y legible por quien lo herede dentro de tres años.",
+    out: ["Desarrollo en Next.js", "Responsive real", "Auditoría de rendimiento"],
   },
   {
     num: "04",
-    title: "Transformar",
-    icon: Zap,
-    description: "Publicación en Vercel, optimización de métricas clave y lanzamiento de un sitio que impulsa tu futuro.",
+    word: "Transformar",
+    claim: "Tu idea, en un producto vivo.",
+    body: "Lanzar es el principio. Medimos qué pasa, ajustamos con datos y el sitio sigue moviéndose con el negocio.",
+    out: ["Despliegue y dominio", "Analítica y medición", "Evolución continua"],
   },
 ];
 
 export default function Process() {
+  const [active, setActive] = useState(0);
+  const stepRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+  useEffect(() => {
+    // Una línea imaginaria en la mitad del viewport decide el paso activo.
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          const i = stepRefs.current.indexOf(entry.target as HTMLDivElement);
+          if (i >= 0) setActive(i);
+        }
+      },
+      { rootMargin: "-50% 0px -50% 0px", threshold: 0 },
+    );
+
+    stepRefs.current.forEach((el) => el && io.observe(el));
+    return () => io.disconnect();
+  }, []);
+
   return (
-    <section
-      id="proceso"
-      className="py-24 border-y"
-      style={{
-        backgroundColor: "var(--card-bg)",
-        borderColor: "var(--card-border)",
-        color: "var(--text-primary)",
-      }}
-    >
-      <div className="max-w-6xl mx-auto px-6 sm:px-8">
-        {/* Encabezado */}
-        <div className="text-center max-w-xl mx-auto mb-16">
-          <div
-            className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[#2E1A47] text-xs font-semibold uppercase tracking-wider mb-4"
-            style={{ backgroundColor: "var(--surface-pill)" }}
-          >
-            <span className="w-1.5 h-1.5 rounded-full bg-[#2E1A47]" />
-            <span>Cómo trabajamos</span>
-          </div>
-          <h2 className="text-4xl sm:text-5xl font-bold tracking-tight" style={{ color: "var(--text-primary)" }}>
-            De la idea al impacto
-          </h2>
-          <p className="mt-4 text-base leading-relaxed" style={{ color: "var(--text-secondary)" }}>
-            Un proceso lineal, transparente y sin burocracia que te mantiene al tanto en cada etapa.
-          </p>
-        </div>
+    <section id="proceso" className="relative bg-ink-2 py-24 sm:py-32">
+      {/* Hilo vertical que atraviesa la sección */}
+      <div className="pointer-events-none absolute left-1/2 top-0 hidden h-full w-px -translate-x-1/2 bg-gradient-to-b from-transparent via-[var(--hair)] to-transparent lg:block" />
 
-        {/* Pasos */}
-        <div
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px rounded-2xl overflow-hidden border"
-          style={{ backgroundColor: "var(--card-border)", borderColor: "var(--card-border)" }}
-        >
-          {steps.map((step, idx) => {
-            const Icon = step.icon;
-            const isLast = idx === steps.length - 1;
-            return (
-              <div
-                key={step.title}
-                className="relative flex flex-col p-7 transition-colors duration-300 group"
-                style={{ backgroundColor: "var(--card-bg)" }}
-                onMouseEnter={e => (e.currentTarget.style.backgroundColor = "var(--surface-muted)")}
-                onMouseLeave={e => (e.currentTarget.style.backgroundColor = "var(--card-bg)")}
-              >
-                {/* Número y flecha */}
-                <div className="flex items-center justify-between mb-5">
-                  <span
-                    className="text-[11px] font-bold tracking-[0.12em] font-mono"
-                    style={{ color: "var(--surface)", opacity: 0.5 }}
+      <div className="u-shell">
+        <SectionMarker index="03" label="Cómo trabajamos" />
+
+        <div className="grid gap-y-16 lg:grid-cols-12 lg:gap-x-16">
+          {/* ── Índice fijo ──────────────────────────────────── */}
+          <div className="lg:col-span-5">
+            <div className="lg:sticky lg:top-[22svh]">
+              <Reveal mode="up" duration={1}>
+                <h2
+                  className="u-display mb-10 max-w-[16ch] text-bone"
+                  style={{ fontSize: "var(--t-h3)" }}
+                >
+                  De la idea al{" "}
+                  <span className="u-serif text-lime">impacto,</span> en cuatro
+                  movimientos.
+                </h2>
+              </Reveal>
+
+              {/* Palabra activa */}
+              <div className="u-clip hidden h-[1.05em] lg:block" style={{ fontSize: "var(--t-h2)" }}>
+                <AnimatePresence mode="wait">
+                  <motion.p
+                    key={active}
+                    initial={{ y: "100%" }}
+                    animate={{ y: "0%" }}
+                    exit={{ y: "-100%" }}
+                    transition={{ duration: 0.55, ease: [0.76, 0, 0.24, 1] }}
+                    className="u-display-tight text-lime"
                   >
-                    {step.num}
-                  </span>
-                  {!isLast && (
-                    <span className="hidden lg:block text-xs font-light" style={{ color: "var(--text-secondary)", opacity: 0.3 }}>
-                      →
-                    </span>
-                  )}
-                </div>
-
-                {/* Ícono */}
-                <div
-                  className="w-11 h-11 rounded-xl flex items-center justify-center mb-5 shadow-sm transition-all duration-300 group-hover:bg-[#2E1A47] group-hover:text-[#C8FF4D]"
-                  style={{ backgroundColor: "var(--surface-pill)", color: "var(--surface)" }}
-                >
-                  <Icon className="w-5 h-5" />
-                </div>
-
-                <h3
-                  className="text-lg font-bold mb-2 transition-colors duration-200 group-hover:text-[#2E1A47]"
-                  style={{ color: "var(--text-primary)" }}
-                >
-                  {step.title}
-                </h3>
-                <p className="text-sm leading-relaxed" style={{ color: "var(--text-secondary)" }}>
-                  {step.description}
-                </p>
-
-                {/* Acento inferior en hover */}
-                <div className="absolute bottom-0 left-0 h-0.5 w-0 bg-[#C8FF4D] group-hover:w-full transition-all duration-500 rounded-full" />
+                    {steps[active].word}
+                  </motion.p>
+                </AnimatePresence>
               </div>
-            );
-          })}
+
+              {/* Lista de pasos con estado */}
+              <ol className="mt-10 space-y-3">
+                {steps.map((s, i) => (
+                  <li key={s.num} className="flex items-center gap-4">
+                    <span
+                      className={`u-mono-num text-[var(--t-2xs)] transition-colors duration-500 ${
+                        i === active ? "text-lime" : "text-[var(--fg-faint)]"
+                      }`}
+                    >
+                      {s.num}
+                    </span>
+                    <span
+                      className="h-px transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]"
+                      style={{
+                        width: i === active ? "3rem" : "1rem",
+                        backgroundColor:
+                          i === active ? "var(--lime)" : "var(--hair)",
+                      }}
+                    />
+                    <span
+                      className={`u-mono transition-colors duration-500 ${
+                        i === active ? "text-bone" : "text-[var(--fg-faint)]"
+                      }`}
+                    >
+                      {s.word}
+                    </span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          </div>
+
+          {/* ── Pasos ────────────────────────────────────────── */}
+          <div className="lg:col-span-7">
+            {steps.map((s, i) => (
+              <div
+                key={s.num}
+                ref={(el) => {
+                  stepRefs.current[i] = el;
+                }}
+                className="flex min-h-[62svh] flex-col justify-center border-t border-[var(--hair)] py-12 first:border-t-0 lg:min-h-[78svh]"
+              >
+                <Reveal mode="up" duration={1}>
+                  <span className="u-mono mb-6 block text-lime lg:hidden">
+                    {s.num} — {s.word}
+                  </span>
+
+                  <p
+                    className="u-display mb-6 max-w-[20ch] text-bone"
+                    style={{ fontSize: "var(--t-h4)" }}
+                  >
+                    {s.claim}
+                  </p>
+
+                  <p className="mb-10 max-w-[46ch] text-[var(--t-body)] leading-relaxed text-[var(--fg-dim)]">
+                    {s.body}
+                  </p>
+
+                  <ul className="space-y-0">
+                    {s.out.map((o) => (
+                      <li
+                        key={o}
+                        className="group flex items-center justify-between border-b border-[var(--hair)] py-3.5"
+                      >
+                        <span className="text-[var(--t-sm)] text-[var(--fg-dim)] transition-transform duration-500 group-hover:translate-x-1">
+                          {o}
+                        </span>
+                        <span className="h-1 w-1 rounded-full bg-[var(--fg-faint)] transition-colors duration-500 group-hover:bg-lime" />
+                      </li>
+                    ))}
+                  </ul>
+                </Reveal>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>
