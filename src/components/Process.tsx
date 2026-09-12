@@ -63,7 +63,7 @@ export default function Process() {
       <div className="pointer-events-none absolute left-1/2 top-0 hidden h-full w-px -translate-x-1/2 bg-gradient-to-b from-transparent via-[var(--hair)] to-transparent lg:block" />
 
       <div className="u-shell">
-        <SectionMarker index="03" label="Cómo trabajamos" />
+        <SectionMarker index="04" label="Cómo trabajamos" />
 
         <div className="grid gap-y-16 lg:grid-cols-12 lg:gap-x-16">
           {/* ── Índice fijo ──────────────────────────────────── */}
