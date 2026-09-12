@@ -12,8 +12,10 @@ const columns = [
     links: [
       { label: "Premisa", href: "#premisa" },
       { label: "Lo que hacemos", href: "#que-hacemos" },
+      { label: "Formatos", href: "#formatos" },
       { label: "Proceso", href: "#proceso" },
       { label: "Manifiesto", href: "#manifiesto" },
+      { label: "Precios", href: "#precios" },
     ],
   },
   {

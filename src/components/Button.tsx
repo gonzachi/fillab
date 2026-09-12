@@ -60,7 +60,7 @@ export default function Button({
               }
             : undefined
         }
-        className={`group relative isolate inline-flex items-center gap-3 overflow-hidden rounded-full font-semibold tracking-[-0.01em] ${sizes[size]} ${skin}`}
+        className={`group relative isolate inline-flex items-center justify-center gap-3 overflow-hidden rounded-full font-semibold tracking-[-0.01em] ${sizes[size]} ${skin} ${className}`}
       >
         {/* Relleno que sube */}
         <span

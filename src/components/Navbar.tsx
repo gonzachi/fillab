@@ -17,8 +17,9 @@ import { scrollTo } from "@/lib/scroll";
 const links = [
   { num: "01", label: "Premisa", href: "#premisa" },
   { num: "02", label: "Trabajo", href: "#que-hacemos" },
-  { num: "03", label: "Proceso", href: "#proceso" },
-  { num: "04", label: "Manifiesto", href: "#manifiesto" },
+  { num: "03", label: "Formatos", href: "#formatos" },
+  { num: "04", label: "Proceso", href: "#proceso" },
+  { num: "05", label: "Precios", href: "#precios" },
 ];
 
 export default function Navbar() {
@@ -79,7 +80,7 @@ export default function Navbar() {
           </Magnetic>
 
           {/* Navegación */}
-          <nav className="hidden items-center gap-9 lg:flex">
+          <nav className="hidden items-center gap-7 xl:flex">
             {links.map((l) => (
               <a
                 key={l.label}
@@ -113,7 +114,7 @@ export default function Navbar() {
             <button
               onClick={() => setOpen(true)}
               aria-label="Abrir menú"
-              className="flex flex-col items-end gap-[5px] p-2 lg:hidden"
+              className="flex flex-col items-end gap-[5px] p-2 xl:hidden"
             >
               <span className="block h-px w-6 bg-bone" />
               <span className="block h-px w-4 bg-bone" />

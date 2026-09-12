@@ -70,7 +70,7 @@ export default function Contact() {
       />
 
       <div className="u-shell relative">
-        <SectionMarker index="07" label="Contacto" />
+        <SectionMarker index="09" label="Contacto" />
 
         <div className="grid gap-16 md:grid-cols-12 md:gap-14">
           {/* ── Invitación y vías directas ─────────────────────── */}

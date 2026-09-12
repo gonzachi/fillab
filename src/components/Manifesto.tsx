@@ -61,7 +61,7 @@ export default function Manifesto() {
       <div className="u-shell relative">
         {/* ── Léxico ─────────────────────────────────────────── */}
         <div className="pt-24 sm:pt-36">
-          <SectionMarker index="04" label="Léxico" tone="light" />
+          <SectionMarker index="05" label="Léxico" tone="light" />
 
           <div className="divide-y" style={{ borderColor: "var(--hair-paper)" }}>
             {lexicon.map((entry, i) => (
@@ -72,7 +72,7 @@ export default function Manifesto() {
 
         {/* ── Manifiesto ─────────────────────────────────────── */}
         <div className="border-t py-24 sm:py-32" style={{ borderColor: "var(--hair-paper)" }}>
-          <SectionMarker index="05" label="Manifiesto" tone="light" />
+          <SectionMarker index="06" label="Manifiesto" tone="light" />
 
           <div>
             {beliefs.map((b, i) => (

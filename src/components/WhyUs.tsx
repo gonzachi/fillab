@@ -38,7 +38,7 @@ export default function WhyUs() {
   return (
     <section id="por-que" className="relative bg-ink py-24 sm:py-32">
       <div className="u-shell">
-        <SectionMarker index="06" label="Por qué Fil Lab" />
+        <SectionMarker index="07" label="Por qué Fil Lab" />
 
         {/* ── Encabezado asimétrico ──────────────────────────── */}
         <div className="grid gap-10 md:grid-cols-12 md:gap-16">
