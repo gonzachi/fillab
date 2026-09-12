@@ -2,43 +2,69 @@
 
 @theme {
   --font-sans: var(--font-sora), system-ui, -apple-system, sans-serif;
-  --color-primary: #064E3B;
-  --color-primary-dark: #033629;
-  --color-primary-light: #0d6950;
-  --color-mint: #3DD6BC;
-  --color-mint-light: #5eead4;
-  --color-mint-dark: #14b8a6;
-  --color-dark: #1F2A27;
-  --color-muted: #888888;
-  --color-surface: #F4F4F2;
-  --color-surface-card: #FFFFFF;
+
+  /* Paleta "Editorial Bold" — tokens canónicos */
+  --color-bg:              #F5F3EF;
+  --color-surface:         #2E1A47;
+  --color-accent:          #C8FF4D;
+  --color-text-primary:    #1A1A18;
+  --color-text-secondary:  #6B6258;
+
+  /* Dark mode */
+  --color-bg-dark:         #120A1C;
+  --color-surface-dark:    #2E1A47;
+  --color-text-primary-dark:   #F5F3EF;
+  --color-text-secondary-dark: #B8AFC4;
 }
 
+/* ─── Tokens vía CSS variables ─────────────────────────────── */
 :root {
-  --background: #F4F4F2;
-  --foreground: #1F2A27;
+  --bg:             #F5F3EF;
+  --surface:        #2E1A47;
+  --accent:         #C8FF4D;
+  --text-primary:   #1A1A18;
+  --text-secondary: #6B6258;
+  --card-bg:        #FFFFFF;
+  --card-border:    rgba(26, 26, 24, 0.08);
+  --surface-muted:  rgba(46, 26, 71, 0.06);
+  --surface-pill:   rgba(46, 26, 71, 0.08);
 }
 
+[data-theme="dark"] {
+  --bg:             #120A1C;
+  --surface:        #2E1A47;
+  --accent:         #C8FF4D;
+  --text-primary:   #F5F3EF;
+  --text-secondary: #B8AFC4;
+  --card-bg:        #1E0F30;
+  --card-border:    rgba(245, 243, 239, 0.06);
+  --surface-muted:  rgba(46, 26, 71, 0.5);
+  --surface-pill:   rgba(200, 255, 77, 0.1);
+}
+
+/* ─── Reset base ────────────────────────────────────────────── */
 html {
   scroll-behavior: smooth;
+  color-scheme: light dark;
 }
 
 body {
-  background-color: var(--background);
-  color: var(--foreground);
+  background-color: var(--bg);
+  color: var(--text-primary);
   font-family: var(--font-sans);
   overflow-x: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Efectos sutiles de selección */
+/* ─── Selección de texto ────────────────────────────────────── */
 ::selection {
-  background-color: #3DD6BC;
-  color: #064E3B;
+  background-color: var(--accent);
+  color: var(--surface);
 }
 
-/* Glassmorphism utility */
+/* ─── Glass utility (navbar) ───────────────────────────────── */
 .glass-header {
-  background-color: rgba(244, 244, 242, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background-color: rgba(46, 26, 71, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }

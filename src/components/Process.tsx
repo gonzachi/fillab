@@ -8,89 +8,108 @@ const steps = [
     num: "01",
     title: "Pensar",
     icon: Lightbulb,
-    description:
-      "Entendemos la esencia de tu negocio, tu audiencia y tus objetivos antes de tirar una sola línea de código.",
+    description: "Entendemos la esencia de tu negocio, tu audiencia y tus objetivos antes de tirar una sola línea de código.",
   },
   {
     num: "02",
     title: "Experimentar",
     icon: FlaskConical,
-    description:
-      "Prototipamos opciones visuales, testeamos interacciones y definimos la arquitectura sin atarnos a plantillas.",
+    description: "Prototipamos opciones visuales, testeamos interacciones y definimos la arquitectura sin atarnos a plantillas.",
   },
   {
     num: "03",
     title: "Construir",
     icon: Layers,
-    description:
-      "Desarrollo artesanal con Next.js y código modular. Rápido, accesible y optimizado para móviles y retina.",
+    description: "Desarrollo artesanal con Next.js y código modular. Rápido, accesible y optimizado para móviles y retina.",
   },
   {
     num: "04",
     title: "Transformar",
     icon: Zap,
-    description:
-      "Publicación en Vercel, optimización de métricas clave y lanzamiento de un sitio que impulsa tu futuro.",
+    description: "Publicación en Vercel, optimización de métricas clave y lanzamiento de un sitio que impulsa tu futuro.",
   },
 ];
 
 export default function Process() {
   return (
-    <section id="proceso" className="py-24 bg-white text-[#1F2A27] border-y border-[#1F2A27]/8">
+    <section
+      id="proceso"
+      className="py-24 border-y"
+      style={{
+        backgroundColor: "var(--card-bg)",
+        borderColor: "var(--card-border)",
+        color: "var(--text-primary)",
+      }}
+    >
       <div className="max-w-6xl mx-auto px-6 sm:px-8">
         {/* Encabezado */}
         <div className="text-center max-w-xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#064E3B]/8 text-[#064E3B] text-xs font-semibold uppercase tracking-wider mb-4">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#064E3B]" />
+          <div
+            className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[#2E1A47] text-xs font-semibold uppercase tracking-wider mb-4"
+            style={{ backgroundColor: "var(--surface-pill)" }}
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-[#2E1A47]" />
             <span>Cómo trabajamos</span>
           </div>
-          <h2 className="text-4xl sm:text-5xl font-bold tracking-tight text-[#1F2A27]">
+          <h2 className="text-4xl sm:text-5xl font-bold tracking-tight" style={{ color: "var(--text-primary)" }}>
             De la idea al impacto
           </h2>
-          <p className="mt-4 text-base text-[#1F2A27]/60 leading-relaxed">
+          <p className="mt-4 text-base leading-relaxed" style={{ color: "var(--text-secondary)" }}>
             Un proceso lineal, transparente y sin burocracia que te mantiene al tanto en cada etapa.
           </p>
         </div>
 
         {/* Pasos */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-[#1F2A27]/6 rounded-2xl overflow-hidden border border-[#1F2A27]/6">
+        <div
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px rounded-2xl overflow-hidden border"
+          style={{ backgroundColor: "var(--card-border)", borderColor: "var(--card-border)" }}
+        >
           {steps.map((step, idx) => {
             const Icon = step.icon;
             const isLast = idx === steps.length - 1;
             return (
               <div
                 key={step.title}
-                className={`relative flex flex-col p-7 bg-white hover:bg-[#F4F4F2] transition-colors duration-300 group ${
-                  isLast ? "lg:rounded-br-2xl sm:rounded-br-2xl" : ""
-                }`}
+                className="relative flex flex-col p-7 transition-colors duration-300 group"
+                style={{ backgroundColor: "var(--card-bg)" }}
+                onMouseEnter={e => (e.currentTarget.style.backgroundColor = "var(--surface-muted)")}
+                onMouseLeave={e => (e.currentTarget.style.backgroundColor = "var(--card-bg)")}
               >
-                {/* Número y flecha de progreso */}
+                {/* Número y flecha */}
                 <div className="flex items-center justify-between mb-5">
-                  <span className="text-[11px] font-bold tracking-[0.12em] text-[#064E3B]/50 font-mono">
+                  <span
+                    className="text-[11px] font-bold tracking-[0.12em] font-mono"
+                    style={{ color: "var(--surface)", opacity: 0.5 }}
+                  >
                     {step.num}
                   </span>
-                  {/* Flecha conector — solo en desktop y no en último */}
                   {!isLast && (
-                    <span className="hidden lg:block text-[#1F2A27]/15 text-xs font-light">
+                    <span className="hidden lg:block text-xs font-light" style={{ color: "var(--text-secondary)", opacity: 0.3 }}>
                       →
                     </span>
                   )}
                 </div>
 
                 {/* Ícono */}
-                <div className="w-11 h-11 rounded-xl bg-[#F4F4F2] group-hover:bg-[#064E3B] flex items-center justify-center text-[#064E3B] group-hover:text-[#3DD6BC] transition-all duration-300 mb-5 shadow-sm">
+                <div
+                  className="w-11 h-11 rounded-xl flex items-center justify-center mb-5 shadow-sm transition-all duration-300 group-hover:bg-[#2E1A47] group-hover:text-[#C8FF4D]"
+                  style={{ backgroundColor: "var(--surface-pill)", color: "var(--surface)" }}
+                >
                   <Icon className="w-5 h-5" />
                 </div>
 
-                <h3 className="text-lg font-bold text-[#1F2A27] mb-2 group-hover:text-[#064E3B] transition-colors duration-200">
+                <h3
+                  className="text-lg font-bold mb-2 transition-colors duration-200 group-hover:text-[#2E1A47]"
+                  style={{ color: "var(--text-primary)" }}
+                >
                   {step.title}
                 </h3>
-                <p className="text-sm text-[#1F2A27]/60 leading-relaxed">
+                <p className="text-sm leading-relaxed" style={{ color: "var(--text-secondary)" }}>
                   {step.description}
                 </p>
 
-                {/* Acento de color en hover en borde inferior */}
-                <div className="absolute bottom-0 left-0 h-0.5 w-0 bg-[#3DD6BC] group-hover:w-full transition-all duration-400 rounded-full" />
+                {/* Acento inferior en hover */}
+                <div className="absolute bottom-0 left-0 h-0.5 w-0 bg-[#C8FF4D] group-hover:w-full transition-all duration-500 rounded-full" />
               </div>
             );
           })}
