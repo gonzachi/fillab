@@ -17,10 +17,10 @@ const dictionary = [
       "Hilo, hebra. Lo que conecta un extremo con otro, punto a punto, hasta volverse algo.",
   },
   {
-    word: "NODO",
-    grammar: "sust.",
+    word: "LAB",
+    grammar: "sust., ingl. /læb/",
     definition:
-      "Punto donde varios hilos se encuentran y se convierten en algo nuevo. Cada proyecto, un nodo.",
+      "Laboratorio. Espacio donde las ideas se prueban, se rompen y se reconstruyen hasta convertirse en algo real.",
   },
 ];
 
