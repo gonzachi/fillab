@@ -15,6 +15,7 @@ export default function HeroCanvas() {
     let width = (canvas.width = window.innerWidth);
     let height = (canvas.height = window.innerHeight);
 
+    // Posición del puntero (mouse o touch)
     let mouseX = width / 2;
     let mouseY = height / 2;
     let targetMouseX = width / 2;
@@ -24,82 +25,104 @@ export default function HeroCanvas() {
       if (!canvas) return;
       width = canvas.width = window.innerWidth;
       height = canvas.height = window.innerHeight;
+      mouseX = targetMouseX = width / 2;
+      mouseY = targetMouseY = height / 2;
     };
 
+    // Soporte de mouse
     const handleMouseMove = (e: MouseEvent) => {
       const rect = canvas.getBoundingClientRect();
       targetMouseX = e.clientX - rect.left;
       targetMouseY = e.clientY - rect.top;
     };
 
-    window.addEventListener("resize", handleResize);
-    window.addEventListener("mousemove", handleMouseMove);
+    // Soporte de touch para móvil
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length === 0) return;
+      const rect = canvas.getBoundingClientRect();
+      targetMouseX = e.touches[0].clientX - rect.left;
+      targetMouseY = e.touches[0].clientY - rect.top;
+    };
+
+    window.addEventListener("resize", handleResize, { passive: true });
+    window.addEventListener("mousemove", handleMouseMove, { passive: true });
+    window.addEventListener("touchmove", handleTouchMove, { passive: true });
 
     let step = 0;
 
+    // Configuración de líneas: más variedad
+    const lines = [
+      { offset: -30, opacityBase: 0.12, lineWidth: 1.2, phaseShift: 0.0 },
+      { offset: 20,  opacityBase: 0.22, lineWidth: 1.8, phaseShift: 0.5 },
+      { offset: 65,  opacityBase: 0.10, lineWidth: 0.9, phaseShift: 1.1 },
+    ];
+
     const render = () => {
-      step += 0.012;
-      // Suavizado del mouse
-      mouseX += (targetMouseX - mouseX) * 0.05;
-      mouseY += (targetMouseY - mouseY) * 0.05;
+      step += 0.010;
+
+      // Suavizado del puntero
+      mouseX += (targetMouseX - mouseX) * 0.04;
+      mouseY += (targetMouseY - mouseY) * 0.04;
 
       ctx.clearRect(0, 0, width, height);
 
-      // Dibujar hilos orgánicos ondulantes (el "fil")
-      const linesCount = 3;
-      for (let i = 0; i < linesCount; i++) {
+      const baseY = height * 0.58;
+
+      lines.forEach((line, i) => {
+        const startY = baseY + line.offset;
         ctx.beginPath();
-        const offset = i * 40;
-        const opacity = 0.15 + (i * 0.1);
-        ctx.strokeStyle = `rgba(61, 214, 188, ${opacity})`;
-        ctx.lineWidth = 1.8 - (i * 0.3);
+        ctx.strokeStyle = `rgba(61, 214, 188, ${line.opacityBase})`;
+        ctx.lineWidth = line.lineWidth;
+        ctx.lineJoin = "round";
+        ctx.lineCap = "round";
 
-        const startY = height * 0.55 + offset;
-        ctx.moveTo(0, startY);
-
-        const points = 100;
-        let lastX = 0;
-        let lastY = startY;
-
+        const points = 120;
         for (let j = 0; j <= points; j++) {
           const x = (width / points) * j;
-          // Influencia del mouse
-          const distToMouse = Math.hypot(x - mouseX, startY - mouseY);
-          const mouseInfluence = Math.max(0, 1 - distToMouse / 380) * 45;
 
-          const wave1 = Math.sin(step + j * 0.06 + i * 0.5) * 35;
-          const wave2 = Math.cos(step * 0.8 + j * 0.04) * 20;
+          // Influencia del cursor: radio generoso, deflexión sutil
+          const distToMouse = Math.hypot(x - mouseX, startY - mouseY);
+          const mouseInfluence = Math.max(0, 1 - distToMouse / 400) * 50;
+
+          const wave1 = Math.sin(step + j * 0.055 + line.phaseShift) * 32;
+          const wave2 = Math.cos(step * 0.7 + j * 0.038 + line.phaseShift) * 18;
           const y = startY + wave1 + wave2 - mouseInfluence;
 
-          ctx.lineTo(x, y);
-          lastX = x;
-          lastY = y;
+          if (j === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
         }
-
         ctx.stroke();
 
-        // Si es el hilo principal, dibujar el nodo final (el punto de acento de Fil Lab)
+        // Nodo de acento en la línea principal (índice 1)
         if (i === 1) {
-          const nodeX = width * 0.85;
+          const nodeFrac = 0.82;
+          const nodeJ = Math.round(nodeFrac * 120);
+          const nodeX = (width / 120) * nodeJ;
           const nodeDist = Math.hypot(nodeX - mouseX, startY - mouseY);
-          const nodeInfluence = Math.max(0, 1 - nodeDist / 380) * 45;
-          const wave1 = Math.sin(step + (nodeX / width) * 100 * 0.06 + i * 0.5) * 35;
-          const wave2 = Math.cos(step * 0.8 + (nodeX / width) * 100 * 0.04) * 20;
-          const nodeY = startY + wave1 + wave2 - nodeInfluence;
+          const nodeInfluence = Math.max(0, 1 - nodeDist / 400) * 50;
+          const nw1 = Math.sin(step + nodeJ * 0.055 + line.phaseShift) * 32;
+          const nw2 = Math.cos(step * 0.7 + nodeJ * 0.038 + line.phaseShift) * 18;
+          const nodeY = startY + nw1 + nw2 - nodeInfluence;
 
-          // Halo
+          // Halo exterior
           ctx.beginPath();
-          ctx.arc(nodeX, nodeY, 12, 0, Math.PI * 2);
-          ctx.fillStyle = "rgba(61, 214, 188, 0.2)";
+          ctx.arc(nodeX, nodeY, 18, 0, Math.PI * 2);
+          ctx.fillStyle = "rgba(61, 214, 188, 0.08)";
+          ctx.fill();
+
+          // Halo interior
+          ctx.beginPath();
+          ctx.arc(nodeX, nodeY, 10, 0, Math.PI * 2);
+          ctx.fillStyle = "rgba(61, 214, 188, 0.18)";
           ctx.fill();
 
           // Punto sólido de acento
           ctx.beginPath();
-          ctx.arc(nodeX, nodeY, 6, 0, Math.PI * 2);
+          ctx.arc(nodeX, nodeY, 5, 0, Math.PI * 2);
           ctx.fillStyle = "#3DD6BC";
           ctx.fill();
         }
-      }
+      });
 
       animationFrameId = requestAnimationFrame(render);
     };
@@ -109,6 +132,7 @@ export default function HeroCanvas() {
     return () => {
       window.removeEventListener("resize", handleResize);
       window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("touchmove", handleTouchMove);
       cancelAnimationFrame(animationFrameId);
     };
   }, []);
@@ -116,7 +140,8 @@ export default function HeroCanvas() {
   return (
     <canvas
       ref={canvasRef}
-      className="absolute inset-0 pointer-events-none z-0 opacity-80"
+      className="absolute inset-0 pointer-events-none z-0"
+      style={{ opacity: 0.9 }}
     />
   );
 }

@@ -94,7 +94,8 @@ export default function Contact() {
           </div>
 
           {/* Formulario en Card blanca/clara */}
-          <div className="lg:col-span-7 bg-white text-[#1F2A27] rounded-3xl p-8 sm:p-10 shadow-2xl border border-white/20">
+          <div className="lg:col-span-7 bg-white text-[#1F2A27] rounded-3xl p-8 sm:p-10 shadow-[0_32px_80px_-12px_rgba(0,0,0,0.45)] ring-1 ring-white/10">
+
             {submitted ? (
               <div className="py-12 text-center space-y-4">
                 <div className="w-14 h-14 bg-[#3DD6BC]/20 text-[#064E3B] rounded-full flex items-center justify-center mx-auto">
