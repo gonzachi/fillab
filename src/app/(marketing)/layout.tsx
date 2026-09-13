@@ -1,35 +1,21 @@
 import type { Metadata, Viewport } from "next";
-import { Sora, Instrument_Serif, JetBrains_Mono } from "next/font/google";
-import "./globals.css";
+import Script from "next/script";
+import "../globals.css";
 
+import { fontVariables } from "@/lib/fonts";
 import SmoothScroll from "@/components/SmoothScroll";
 import Cursor from "@/components/Cursor";
 import Grain from "@/components/Grain";
 import { IntroProvider } from "@/components/Intro";
 
-/* ─── Tres voces tipográficas ──────────────────────────────────
-   Sora sostiene la estructura, Instrument Serif pone el acento
-   editorial y JetBrains Mono etiqueta todo lo técnico.          */
-
-const sora = Sora({
-  subsets: ["latin"],
-  variable: "--font-sora",
-  display: "swap",
-});
-
-const instrument = Instrument_Serif({
-  subsets: ["latin"],
-  weight: "400",
-  style: ["normal", "italic"],
-  variable: "--font-instrument",
-  display: "swap",
-});
-
-const jetbrains = JetBrains_Mono({
-  subsets: ["latin"],
-  variable: "--font-jetbrains",
-  display: "swap",
-});
+/**
+ * Layout raíz del sitio público. Es un root layout independiente (no un
+ * layout anidado) a propósito: junto con `(dashboard)/layout.tsx`, Next.js
+ * permite más de un root layout en la misma app cuando ninguno envuelve al
+ * otro — así el panel de clientes no hereda el cursor propio, el grano de
+ * película, el scroll con inercia ni la cortina de entrada, que son
+ * lenguaje de marketing, no de una herramienta de trabajo.
+ */
 
 const DESCRIPTION =
   "Consultora creativa boutique de diseño y desarrollo web en Barcelona. Sitios a medida, rápidos y de alto impacto, hechos con criterio y sin plantillas.";
@@ -74,15 +60,24 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-export default function RootLayout({
+// Sin NEXT_PUBLIC_UMAMI_WEBSITE_ID no se manda tráfico a ningún lado — así
+// el sitio en local o en un preview branch nunca ensucia las métricas
+// reales con visitas de desarrollo.
+const umamiWebsiteId = process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID;
+
+export default function MarketingLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html
-      lang="es"
-      className={`${sora.variable} ${instrument.variable} ${jetbrains.variable}`}
-    >
+    <html lang="es" className={fontVariables}>
       <body>
+        {umamiWebsiteId && (
+          <Script
+            src="https://fillab-umami.vercel.app/script.js"
+            data-website-id={umamiWebsiteId}
+            strategy="afterInteractive"
+          />
+        )}
         <SmoothScroll>
           <IntroProvider>
             <Grain />

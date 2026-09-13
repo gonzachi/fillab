@@ -123,6 +123,24 @@ img, svg, canvas { display: block; max-width: 100%; }
   }
 }
 
+/* Excepción: el dashboard no monta <Cursor />, así que necesita el
+   puntero real de vuelta — tanto en el body como en todo lo clicable. */
+[data-native-cursor],
+[data-native-cursor] a,
+[data-native-cursor] button,
+[data-native-cursor] [role="button"],
+[data-native-cursor] input,
+[data-native-cursor] textarea,
+[data-native-cursor] select,
+[data-native-cursor] label[for] {
+  cursor: auto !important;
+}
+[data-native-cursor] a,
+[data-native-cursor] button,
+[data-native-cursor] [role="button"] {
+  cursor: pointer !important;
+}
+
 /* ═══════════════════════════════════════════════════════════
    UTILIDADES TIPOGRÁFICAS
    Tres voces: display (Sora 800), serif (Instrument italic), mono.
