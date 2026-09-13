@@ -114,10 +114,24 @@ async function umamiFetch<T>(
 }
 
 // ─── Resumen de estadísticas ─────────────────────────────────────────────
+// Forma verificada contra una instancia real (no solo contra la
+// documentación): números planos + un objeto `comparison` aparte con el
+// período anterior, no `{value, prev}` anidado por métrica como sugería
+// la doc pública al momento de escribir esto.
 
-interface RawStatMetric {
-  value: number;
-  prev: number;
+interface RawStats {
+  pageviews: number;
+  visitors: number;
+  visits: number;
+  bounces: number;
+  totaltime: number;
+  comparison: {
+    pageviews: number;
+    visitors: number;
+    visits: number;
+    bounces: number;
+    totaltime: number;
+  };
 }
 
 export async function getStats(
@@ -127,22 +141,17 @@ export async function getStats(
   if (!isUmamiConfigured) return getDemoStats(preset);
 
   const { startAt, endAt } = presetToRange(preset);
-  const raw = await umamiFetch<{
-    pageviews: RawStatMetric;
-    visitors: RawStatMetric;
-    visits: RawStatMetric;
-    bounces: RawStatMetric;
-    totaltime: RawStatMetric;
-  }>(`/api/websites/${websiteId}/stats`, { startAt, endAt });
-
-  const toDelta = (m: RawStatMetric) => ({ value: m.value, previous: m.prev });
+  const raw = await umamiFetch<RawStats>(`/api/websites/${websiteId}/stats`, {
+    startAt,
+    endAt,
+  });
 
   return {
-    pageviews: toDelta(raw.pageviews),
-    visitors: toDelta(raw.visitors),
-    visits: toDelta(raw.visits),
-    bounces: toDelta(raw.bounces),
-    totalTime: toDelta(raw.totaltime),
+    pageviews: { value: raw.pageviews, previous: raw.comparison.pageviews },
+    visitors: { value: raw.visitors, previous: raw.comparison.visitors },
+    visits: { value: raw.visits, previous: raw.comparison.visits },
+    bounces: { value: raw.bounces, previous: raw.comparison.bounces },
+    totalTime: { value: raw.totaltime, previous: raw.comparison.totaltime },
   };
 }
 
@@ -182,8 +191,11 @@ export async function getSeries(
 
 // ─── Listas rankeadas (páginas, referrers, países, dispositivos) ────────
 
+// Nombres verificados contra `src/lib/constants.ts` (EVENT_COLUMNS /
+// SESSION_COLUMNS) de una instancia real de Umami 3.3.1 — "path", no
+// "url", es el que rompía silenciosamente con un 400 antes de este ajuste.
 const METRIC_TYPE = {
-  pages: "url",
+  pages: "path",
   referrers: "referrer",
   countries: "country",
   devices: "device",

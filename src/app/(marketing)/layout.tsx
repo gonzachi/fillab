@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import "../globals.css";
 
 import { fontVariables } from "@/lib/fonts";
@@ -59,12 +60,24 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
+// Sin NEXT_PUBLIC_UMAMI_WEBSITE_ID no se manda tráfico a ningún lado — así
+// el sitio en local o en un preview branch nunca ensucia las métricas
+// reales con visitas de desarrollo.
+const umamiWebsiteId = process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID;
+
 export default function MarketingLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="es" className={fontVariables}>
       <body>
+        {umamiWebsiteId && (
+          <Script
+            src="https://fillab-umami.vercel.app/script.js"
+            data-website-id={umamiWebsiteId}
+            strategy="afterInteractive"
+          />
+        )}
         <SmoothScroll>
           <IntroProvider>
             <Grain />
